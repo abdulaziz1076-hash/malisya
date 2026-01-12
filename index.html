@@ -1274,7 +1274,71 @@
             // كود عرض المنتج الفاخر
         }
     </script>
+    <script>
+    // تشغيل التطبيق الرئيسي
+    document.addEventListener('DOMContentLoaded', function() {
+        // انتظر حتى يتم تحميل كل شيء
+        setTimeout(function() {
+            // تهيئة التطبيق
+            if (typeof appMain !== 'undefined') {
+                appMain.init();
+            }
+            
+            // دالة للانتقال للمنتجات
+            const scrollBtn = document.getElementById('scrollToProducts');
+            if (scrollBtn) {
+                scrollBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productsSection = document.getElementById('productsSection');
+                    if (productsSection) {
+                        productsSection.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            }
+            
+            // دالة لعرض فوائد المنتجات
+            window.showBenefits = function() {
+                if (typeof appMain !== 'undefined') {
+                    appMain.showAlert('قريباً: فيديو تعريفي بفوائد منتجات DXN الصحية', 'info');
+                }
+            };
+            
+            // فلتر المنتجات
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // إزالة النشط من جميع الأزرار
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    // إضافة النشط للزر المختار
+                    this.classList.add('active');
+                    
+                    // تطبيق الفلتر
+                    if (typeof appMain !== 'undefined') {
+                        appMain.filterProducts(this.textContent);
+                    }
+                });
+            });
+            
+            // زر إتمام الطلب
+            const checkoutBtn = document.getElementById('checkoutBtnPremium');
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener('click', function() {
+                    if (typeof appMain !== 'undefined') {
+                        appMain.openOrderModal();
+                    }
+                });
+            }
+            
+            console.log('✅ موقع ماليزيا الذهبية جاهز للعمل');
+        }, 500);
+    });
+</script>
 </body>
 </html>
+
 
 
