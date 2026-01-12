@@ -1,34 +1,31 @@
-// shared-storage.js
-// نظام التخزين المشترك بين الصفحتين
+// shared-storage.js - مخزن مشترك بين الصفحات
+// هذا الملف يربط بين simple-storage.js وكلا الصفحتين
 
-const STORAGE_KEYS = {
-    PRODUCTS: 'goldenMalaysiaProducts',
-    ORDERS: 'goldenMalaysiaOrders',
-    SETTINGS: 'goldenMalaysiaSettings',
-    LAST_UPDATE: 'goldenMalaysiaLastUpdate'
-};
-
-class SharedStorage {
+// التهيئة العالمية للتخزين
+window.simpleStorage = window.simpleStorage || new (class SimpleStorage {
     constructor() {
+        this.keys = {
+            PRODUCTS: 'goldenMalaysiaProducts',
+            ORDERS: 'goldenMalaysiaOrders',
+            SETTINGS: 'goldenMalaysiaSettings',
+            LAST_UPDATE: 'goldenMalaysiaLastUpdate'
+        };
         this.initDefaultData();
     }
 
-    // تهيئة بيانات افتراضية إذا لم تكن موجودة
     initDefaultData() {
+        // إذا لم توجد بيانات، نقوم بتهيئة بيانات افتراضية
         if (!this.getProducts().length) {
             this.setProducts(this.getDefaultProducts());
         }
-        
         if (!this.getSettings()) {
             this.setSettings(this.getDefaultSettings());
         }
-        
         if (!this.getOrders().length) {
             this.setOrders(this.getDefaultOrders());
         }
     }
 
-    // المنتجات الافتراضية
     getDefaultProducts() {
         return [
             {
@@ -42,8 +39,8 @@ class SharedStorage {
                 category: ["popular", "energy", "health"],
                 stock: 50,
                 available: true,
-                isNew: false,
                 isPopular: true,
+                isNew: false,
                 createdAt: "2024-01-15"
             },
             {
@@ -124,23 +121,21 @@ class SharedStorage {
         ];
     }
 
-    // الإعدادات الافتراضية
     getDefaultSettings() {
         return {
             deliveryFee: 30,
             deliveryAreas: "abu-dhabi",
-            deliveryTime: "24 ساعة كحد أقصى",
+            deliveryTime: "24 ساعة",
             whatsappNumber: "+971501234567",
             instagramLink: "@malaysian_products",
-            welcomeMessage: "اكتشف مجموعة مختارة من أفضل المنتجات الماليزية الصحية والعالية الجودة، توصيل سريع خلال 24 ساعة في أبوظبي",
-            siteTitle: "ماليزيا الذهبية - منتجات DXN الصحية",
-            siteDescription: "نخبة المنتجات الصحية الماليزية المستوردة مباشرة من مصانع DXN",
+            welcomeMessage: "اكتشف مجموعة مختارة من أفضل المنتجات الماليزية الصحية والعالية الجودة",
+            siteTitle: "ماليزيا الذهبية",
+            siteDescription: "منتجات DXN الصحية من ماليزيا",
             freeShippingThreshold: 300,
             currency: "درهم"
         };
     }
 
-    // الطلبات الافتراضية
     getDefaultOrders() {
         return [
             {
@@ -148,7 +143,6 @@ class SharedStorage {
                 orderNumber: "ORD-2024-001",
                 customerName: "أحمد محمد",
                 customerPhone: "+971501112233",
-                customerLocation: { lat: 24.4539, lng: 54.3773 },
                 products: [
                     { id: 1, name: "قهوة الجانوديرما الفاخرة", quantity: 2, price: 95 },
                     { id: 3, name: "شاي أخضر ماليزي عضوي", quantity: 1, price: 45 }
@@ -158,50 +152,18 @@ class SharedStorage {
                 total: 265,
                 paymentMethod: "cash",
                 status: "new",
-                orderDate: "2024-03-15T10:30:00Z",
-                notes: "يرجى الاتصال قبل التوصيل"
-            },
-            {
-                id: 2,
-                orderNumber: "ORD-2024-002",
-                customerName: "فاطمة عبدالله",
-                customerPhone: "+971502223344",
-                customerLocation: { lat: 24.4667, lng: 54.3667 },
-                products: [
-                    { id: 2, name: "عسل المانوكا الأصلي", quantity: 1, price: 120 }
-                ],
-                subtotal: 120,
-                deliveryFee: 30,
-                total: 150,
-                paymentMethod: "cash",
-                status: "completed",
-                orderDate: "2024-03-14T14:20:00Z",
-                notes: ""
-            },
-            {
-                id: 3,
-                orderNumber: "ORD-2024-003",
-                customerName: "خالد سعيد",
-                customerPhone: "+971503334455",
-                customerLocation: { lat: 24.4300, lng: 54.4333 },
-                products: [
-                    { id: 5, name: "مكمل سبيرولينا الغذائي", quantity: 1, price: 95 },
-                    { id: 6, name: "قهوة لينزي التقليدية", quantity: 2, price: 75 }
-                ],
-                subtotal: 245,
-                deliveryFee: 30,
-                total: 275,
-                paymentMethod: "cash",
-                status: "processing",
-                orderDate: "2024-03-13T09:15:00Z",
-                notes: "العميل يفضل التوصيل في المساء"
+                orderDate: "2024-03-15T10:30:00.000Z"
             }
         ];
     }
 
-    // === وظائف GET ===
     getProducts() {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.PRODUCTS)) || [];
+        try {
+            return JSON.parse(localStorage.getItem(this.keys.PRODUCTS)) || [];
+        } catch (e) {
+            console.error('خطأ في قراءة المنتجات:', e);
+            return [];
+        }
     }
 
     getProduct(id) {
@@ -209,7 +171,12 @@ class SharedStorage {
     }
 
     getOrders() {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.ORDERS)) || [];
+        try {
+            return JSON.parse(localStorage.getItem(this.keys.ORDERS)) || [];
+        } catch (e) {
+            console.error('خطأ في قراءة الطلبات:', e);
+            return [];
+        }
     }
 
     getOrder(id) {
@@ -217,43 +184,66 @@ class SharedStorage {
     }
 
     getSettings() {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS)) || this.getDefaultSettings();
+        try {
+            return JSON.parse(localStorage.getItem(this.keys.SETTINGS)) || this.getDefaultSettings();
+        } catch (e) {
+            console.error('خطأ في قراءة الإعدادات:', e);
+            return this.getDefaultSettings();
+        }
     }
 
-    getLastUpdate() {
-        return localStorage.getItem(STORAGE_KEYS.LAST_UPDATE);
-    }
-
-    // === وظائف SET ===
     setProducts(products) {
-        localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-        this.updateTimestamp();
+        try {
+            localStorage.setItem(this.keys.PRODUCTS, JSON.stringify(products));
+            this.updateTimestamp();
+            return true;
+        } catch (e) {
+            console.error('خطأ في حفظ المنتجات:', e);
+            return false;
+        }
     }
 
     setOrders(orders) {
-        localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
-        this.updateTimestamp();
+        try {
+            localStorage.setItem(this.keys.ORDERS, JSON.stringify(orders));
+            this.updateTimestamp();
+            return true;
+        } catch (e) {
+            console.error('خطأ في حفظ الطلبات:', e);
+            return false;
+        }
     }
 
     setSettings(settings) {
-        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-        this.updateTimestamp();
+        try {
+            localStorage.setItem(this.keys.SETTINGS, JSON.stringify(settings));
+            this.updateTimestamp();
+            return true;
+        } catch (e) {
+            console.error('خطأ في حفظ الإعدادات:', e);
+            return false;
+        }
     }
 
-    // === وظائف UPDATE ===
-    addProduct(product) {
+    addProduct(productData) {
         const products = this.getProducts();
         const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-        product.id = newId;
-        product.createdAt = new Date().toISOString();
-        products.push(product);
+        
+        const newProduct = {
+            id: newId,
+            ...productData,
+            createdAt: new Date().toISOString()
+        };
+        
+        products.push(newProduct);
         this.setProducts(products);
-        return product;
+        return newProduct;
     }
 
     updateProduct(id, updates) {
         const products = this.getProducts();
         const index = products.findIndex(p => p.id == id);
+        
         if (index !== -1) {
             products[index] = { ...products[index], ...updates };
             this.setProducts(products);
@@ -265,38 +255,41 @@ class SharedStorage {
     deleteProduct(id) {
         const products = this.getProducts();
         const filtered = products.filter(p => p.id != id);
-        this.setProducts(filtered);
-        return filtered.length !== products.length;
-    }
-
-    addOrder(order) {
-        const orders = this.getOrders();
-        const newId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
-        order.id = newId;
-        order.orderNumber = `ORD-${new Date().getFullYear()}-${String(newId).padStart(3, '0')}`;
-        order.orderDate = new Date().toISOString();
-        order.status = order.status || 'new';
-        orders.push(order);
-        this.setOrders(orders);
-        return order;
-    }
-
-    updateOrderStatus(id, status) {
-        const orders = this.getOrders();
-        const index = orders.findIndex(o => o.id == id);
-        if (index !== -1) {
-            orders[index].status = status;
-            this.setOrders(orders);
+        
+        if (filtered.length !== products.length) {
+            this.setProducts(filtered);
             return true;
         }
         return false;
     }
 
-    deleteOrder(id) {
+    addOrder(orderData) {
         const orders = this.getOrders();
-        const filtered = orders.filter(o => o.id != id);
-        this.setOrders(filtered);
-        return filtered.length !== orders.length;
+        const newId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
+        
+        const newOrder = {
+            id: newId,
+            orderNumber: `ORD-${new Date().getFullYear()}-${String(newId).padStart(3, '0')}`,
+            ...orderData,
+            orderDate: new Date().toISOString(),
+            status: orderData.status || 'new'
+        };
+        
+        orders.push(newOrder);
+        this.setOrders(orders);
+        return newOrder;
+    }
+
+    updateOrder(id, updates) {
+        const orders = this.getOrders();
+        const index = orders.findIndex(o => o.id == id);
+        
+        if (index !== -1) {
+            orders[index] = { ...orders[index], ...updates };
+            this.setOrders(orders);
+            return true;
+        }
+        return false;
     }
 
     updateSettings(updates) {
@@ -306,40 +299,14 @@ class SharedStorage {
         return newSettings;
     }
 
-    // === وظائف مساعدة ===
     updateTimestamp() {
-        localStorage.setItem(STORAGE_KEYS.LAST_UPDATE, Date.now().toString());
+        localStorage.setItem(this.keys.LAST_UPDATE, Date.now().toString());
     }
+})();
 
-    hasNewData(lastChecked) {
-        const lastUpdate = this.getLastUpdate();
-        return lastUpdate && parseInt(lastUpdate) > parseInt(lastChecked || 0);
-    }
-
-    exportData() {
-        return {
-            products: this.getProducts(),
-            orders: this.getOrders(),
-            settings: this.getSettings(),
-            exportDate: new Date().toISOString()
-        };
-    }
-
-    importData(data) {
-        if (data.products) this.setProducts(data.products);
-        if (data.orders) this.setOrders(data.orders);
-        if (data.settings) this.setSettings(data.settings);
-        return true;
-    }
-
-    clearAllData() {
-        localStorage.removeItem(STORAGE_KEYS.PRODUCTS);
-        localStorage.removeItem(STORAGE_KEYS.ORDERS);
-        localStorage.removeItem(STORAGE_KEYS.SETTINGS);
-        localStorage.removeItem(STORAGE_KEYS.LAST_UPDATE);
-        this.initDefaultData();
-    }
+// إذا كان الملف simple-storage.js موجوداً، نستخدمه
+if (typeof SimpleStorage !== 'undefined') {
+    window.simpleStorage = new SimpleStorage();
 }
 
-// إنشاء نسخة عامة للاستخدام
-window.sharedStorage = new SharedStorage();
+console.log('✅ نظام التخزين المشترك جاهز');
