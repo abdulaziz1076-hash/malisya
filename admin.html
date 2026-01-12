@@ -546,15 +546,15 @@
                         <h3><i class="fas fa-bolt"></i> الإجراءات السريعة</h3>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                      <button class="btn btn-primary" onclick="appAdmin.showProductModal()" style="justify-content: center;">
-                         <i class="fas fa-plus"></i> إضافة منتج
-                      </button>
-                      <button class="btn btn-success" onclick="appAdmin.showOrderModal()" style="justify-content: center;">
-                      <i class="fas fa-cart-plus"></i> إنشاء طلب
-                      </button>
-                      <button class="btn btn-primary" onclick="appAdmin.exportData()" style="justify-content: center;">
-                      <i class="fas fa-file-export"></i> تصدير البيانات
-                      </button>
+                        <button class="btn btn-primary" onclick="appAdmin.showProductModal()" style="justify-content: center;">
+                            <i class="fas fa-plus"></i> إضافة منتج
+                        </button>
+                        <button class="btn btn-success" onclick="appAdmin.showOrderModal()" style="justify-content: center;">
+                            <i class="fas fa-cart-plus"></i> إنشاء طلب
+                        </button>
+                        <button class="btn btn-primary" onclick="appAdmin.exportData()" style="justify-content: center;">
+                            <i class="fas fa-file-export"></i> تصدير البيانات
+                        </button>
                     </div>
                 </div>
                 
@@ -747,10 +747,225 @@
         </div>
     </div>
 
-    <!-- ملفات JavaScript -->
-    <script src="simple-storage.js"></script>
+    <!-- JavaScript -->
     <script>
-        // admin-functions.js - نسخة مبسطة وعملية
+        // بيانات المنتجات الافتراضية
+        const defaultProducts = [
+            {
+                id: 1,
+                name: "قهوة الجانوديرما",
+                brand: "DXN",
+                description: "قهوة صحية مع خلاصة فطر الجانوديرما لتقوية المناعة والطاقة",
+                price: 85,
+                image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                category: ["coffee", "health"],
+                available: true,
+                stock: 50
+            },
+            {
+                id: 2,
+                name: "كبسولات الجانوديرما",
+                brand: "DXN",
+                description: "كبسولات فطر الجانوديرما النقية لدعم الصحة العامة والمناعة",
+                price: 120,
+                image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                category: ["health"],
+                available: true,
+                stock: 30
+            },
+            {
+                id: 3,
+                name: "شاي سبيرولينا",
+                brand: "DXN",
+                description: "شاي عضوي مع سبيرولينا لإزالة السموم وتنقية الجسم",
+                price: 75,
+                image: "https://images.unsplash.com/photo-1561047029-3000c68339ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                category: ["coffee", "health"],
+                available: true,
+                stock: 40
+            }
+        ];
+
+        // بيانات الطلبات الافتراضية
+        const defaultOrders = [
+            {
+                id: 1001,
+                orderNumber: "ORD-2024001",
+                customerName: "أحمد محمد",
+                customerPhone: "+971501234567",
+                address: "دبي - ديرة",
+                items: [
+                    { productId: 1, productName: "قهوة الجانوديرما", price: 85, quantity: 2, total: 170 }
+                ],
+                subtotal: 170,
+                deliveryFee: 30,
+                total: 200,
+                paymentMethod: "cash",
+                status: "new",
+                orderDate: "2024-01-15T10:30:00Z"
+            },
+            {
+                id: 1002,
+                orderNumber: "ORD-2024002",
+                customerName: "سارة خالد",
+                customerPhone: "+971502345678",
+                address: "أبوظبي - المصفح",
+                items: [
+                    { productId: 2, productName: "كبسولات الجانوديرما", price: 120, quantity: 1, total: 120 },
+                    { productId: 3, productName: "شاي سبيرولينا", price: 75, quantity: 1, total: 75 }
+                ],
+                subtotal: 195,
+                deliveryFee: 30,
+                total: 225,
+                paymentMethod: "cash",
+                status: "processing",
+                orderDate: "2024-01-14T15:45:00Z"
+            }
+        ];
+
+        // إعدادات الافتراضية
+        const defaultSettings = {
+            currency: "درهم",
+            deliveryFee: 30,
+            whatsappNumber: "+971501234567",
+            storeName: "Golden Malaysia"
+        };
+
+        // نظام التخزين
+        window.simpleStorage = {
+            // المنتجات
+            getProducts: function() {
+                try {
+                    const saved = localStorage.getItem('goldenMalaysia_products');
+                    return saved ? JSON.parse(saved) : defaultProducts;
+                } catch (error) {
+                    console.error('Error loading products:', error);
+                    return defaultProducts;
+                }
+            },
+            
+            getProduct: function(id) {
+                const products = this.getProducts();
+                return products.find(p => p.id == id);
+            },
+            
+            saveProducts: function(products) {
+                try {
+                    localStorage.setItem('goldenMalaysia_products', JSON.stringify(products));
+                    return true;
+                } catch (error) {
+                    console.error('Error saving products:', error);
+                    return false;
+                }
+            },
+            
+            addProduct: function(productData) {
+                try {
+                    const products = this.getProducts();
+                    const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+                    const newProduct = {
+                        id: newId,
+                        ...productData
+                    };
+                    
+                    products.push(newProduct);
+                    this.saveProducts(products);
+                    return newProduct;
+                } catch (error) {
+                    console.error('Error adding product:', error);
+                    return null;
+                }
+            },
+            
+            updateProduct: function(id, productData) {
+                try {
+                    const products = this.getProducts();
+                    const index = products.findIndex(p => p.id == id);
+                    
+                    if (index === -1) return false;
+                    
+                    products[index] = {
+                        ...products[index],
+                        ...productData,
+                        id: products[index].id // الحفاظ على الـ ID الأصلي
+                    };
+                    
+                    return this.saveProducts(products);
+                } catch (error) {
+                    console.error('Error updating product:', error);
+                    return false;
+                }
+            },
+            
+            deleteProduct: function(id) {
+                try {
+                    const products = this.getProducts();
+                    const filteredProducts = products.filter(p => p.id != id);
+                    return this.saveProducts(filteredProducts);
+                } catch (error) {
+                    console.error('Error deleting product:', error);
+                    return false;
+                }
+            },
+            
+            // الطلبات
+            getOrders: function() {
+                try {
+                    const saved = localStorage.getItem('goldenMalaysia_orders');
+                    return saved ? JSON.parse(saved) : defaultOrders;
+                } catch (error) {
+                    console.error('Error loading orders:', error);
+                    return defaultOrders;
+                }
+            },
+            
+            getOrder: function(id) {
+                const orders = this.getOrders();
+                return orders.find(o => o.id == id);
+            },
+            
+            saveOrders: function(orders) {
+                try {
+                    localStorage.setItem('goldenMalaysia_orders', JSON.stringify(orders));
+                    return true;
+                } catch (error) {
+                    console.error('Error saving orders:', error);
+                    return false;
+                }
+            },
+            
+            updateOrder: function(id, orderData) {
+                try {
+                    const orders = this.getOrders();
+                    const index = orders.findIndex(o => o.id == id);
+                    
+                    if (index === -1) return false;
+                    
+                    orders[index] = {
+                        ...orders[index],
+                        ...orderData,
+                        id: orders[index].id,
+                        orderNumber: orders[index].orderNumber
+                    };
+                    
+                    return this.saveOrders(orders);
+                } catch (error) {
+                    console.error('Error updating order:', error);
+                    return false;
+                }
+            },
+            
+            // الإعدادات
+            getSettings: function() {
+                try {
+                    const saved = localStorage.getItem('goldenMalaysia_settings');
+                    return saved ? JSON.parse(saved) : defaultSettings;
+                } catch (error) {
+                    console.error('Error loading settings:', error);
+                    return defaultSettings;
+                }
+            }
+        };
         
         class AdminApp {
             constructor() {
@@ -996,8 +1211,7 @@
                     description: document.getElementById('productDescription').value,
                     image: document.getElementById('productImage').value,
                     category: [document.getElementById('productCategory').value],
-                    available: document.getElementById('productAvailable').value === 'true',
-                    isPopular: false
+                    available: document.getElementById('productAvailable').value === 'true'
                 };
                 
                 // التحقق من البيانات
