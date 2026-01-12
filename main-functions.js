@@ -1,32 +1,24 @@
-// main-functions.js - وظائف الصفحة الرئيسية
-
+// main-functions.js
 class MainApp {
     constructor() {
         this.cart = [];
-        this.total = 0;
-        this.products = [];
-        this.settings = {};
-        
         this.init();
     }
 
     init() {
-        this.loadProducts();
-        this.loadSettings();
-        this.setupEventListeners();
-        this.updateCartDisplay();
-        
-        // تحميل عربة التسوق من localStorage
-        this.loadCartFromStorage();
-    }
-
-    loadProducts() {
-        this.products = simpleStorage.getProducts();
+        console.log("🚀 بدء تطبيق ماليزيا الذهبية...");
+        this.loadCart();
         this.renderProducts();
+        this.setupEventListeners();
+        this.updateCartUI();
     }
 
-    loadSettings() {
-        this.settings = simpleStorage.getSettings();
+    loadCart() {
+        this.cart = simpleStorage.getCart();
+    }
+
+    saveCart() {
+        simpleStorage.setCart(this.cart);
     }
 
     setupEventListeners() {
@@ -35,8 +27,7 @@ class MainApp {
         if (scrollBtn) {
             scrollBtn.addEventListener('click', () => {
                 document.getElementById('productsSection').scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
+                    behavior: 'smooth' 
                 });
             });
         }
@@ -44,23 +35,42 @@ class MainApp {
         // فلتر المنتجات
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const filter = e.target.getAttribute('onclick').match(/filterProducts\('([^']+)'\)/)[1];
-                this.filterProducts(filter);
+                this.filterProducts(e.target.textContent);
             });
         });
 
-        // تحديث عربة التسوق
-        document.addEventListener('cartUpdated', () => {
-            this.updateCartDisplay();
+        // تحديث واجهة العربة عند أي تغيير
+        document.addEventListener('DOMContentLoaded', () => {
+            this.updateCartUI();
         });
+    }
 
-        // زر إتمام الطلب
-        const checkoutBtn = document.getElementById('checkoutBtnPremium');
-        if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', () => {
-                this.openOrderModal();
-            });
-        }
+    filterProducts(category) {
+        const products = document.querySelectorAll('.product-card-premium');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        
+        // تحديث الأزرار النشطة
+        filterButtons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // فلتر حقيقي حسب الكلمة
+        products.forEach(product => {
+            const productText = product.textContent.toLowerCase();
+            if (category === 'جميع المنتجات' || productText.includes(category.toLowerCase()) || category.includes('المنتجات')) {
+                product.style.display = 'block';
+                setTimeout(() => {
+                    product.style.opacity = '1';
+                    product.style.transform = 'translateY(0)';
+                }, 10);
+            } else {
+                product.style.opacity = '0';
+                product.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    product.style.display = 'none';
+                }, 300);
+            }
+        });
     }
 
     renderProducts() {
@@ -68,35 +78,39 @@ class MainApp {
         if (!container) return;
 
         container.innerHTML = '';
-
-        this.products.forEach(product => {
-            const productCard = this.createProductCard(product);
-            container.appendChild(productCard);
+        
+        const products = simpleStorage.getProducts();
+        
+        products.forEach(product => {
+            const card = this.createProductCard(product);
+            container.appendChild(card);
         });
     }
 
     createProductCard(product) {
         const card = document.createElement('div');
         card.className = 'product-card-premium';
-        card.dataset.id = product.id;
-        card.dataset.category = Array.isArray(product.category) ? product.category.join(' ') : product.category;
+        card.style.cssText = 'opacity: 0; transform: translateY(20px); transition: all 0.3s ease;';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
 
-        const badges = [];
-        if (product.isPopular) badges.push('<span class="product-badge-premium badge-popular"><i class="fas fa-fire"></i> الأكثر مبيعاً</span>');
-        if (product.isNew) badges.push('<span class="product-badge-premium badge-new"><i class="fas fa-star"></i> جديد</span>');
-        if (!product.available || product.stock <= 0) badges.push('<span class="product-badge-premium badge-out"><i class="fas fa-times"></i> غير متوفر</span>');
-
+        const isAvailable = product.available && product.stock > 0;
+        
         card.innerHTML = `
             <div class="product-badge-container">
-                ${badges.join('')}
+                ${product.isPopular ? '<span class="product-badge-premium badge-popular"><i class="fas fa-fire"></i> الأكثر مبيعاً</span>' : ''}
+                ${!isAvailable ? '<span class="product-badge-premium badge-out"><i class="fas fa-times"></i> غير متوفر</span>' : ''}
             </div>
             <div class="product-image-container">
                 <img src="${product.image}" alt="${product.name}" class="product-image-premium">
                 <div class="product-overlay">
                     <button class="btn-premium btn-primary-premium" onclick="appMain.addToCart(${product.id})" 
-                            ${!product.available || product.stock <= 0 ? 'disabled' : ''}>
-                        <i class="fas ${!product.available || product.stock <= 0 ? 'fa-times' : 'fa-cart-plus'}"></i>
-                        ${!product.available || product.stock <= 0 ? 'غير متوفر' : 'أضف إلى العربة'}
+                            ${!isAvailable ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                        <i class="fas ${!isAvailable ? 'fa-times' : 'fa-cart-plus'}"></i>
+                        ${!isAvailable ? 'غير متوفر' : 'أضف إلى العربة'}
                     </button>
                 </div>
             </div>
@@ -105,9 +119,7 @@ class MainApp {
                 <h3 class="product-title-premium">${product.name}</h3>
                 <p class="product-description-premium">${product.description}</p>
                 <div class="product-price-premium">
-                    <div class="price-main">${product.price} ${this.settings.currency || 'درهم'}</div>
-                    ${product.originalPrice && product.originalPrice > product.price ? 
-                        `<div class="price-original">${product.originalPrice} ${this.settings.currency || 'درهم'}</div>` : ''}
+                    <div class="price-main">${product.price} ${simpleStorage.getSettings().currency || 'درهم'}</div>
                 </div>
                 <div class="product-actions-premium">
                     <button class="btn-product-action btn-details-premium" onclick="appMain.showProductDetails(${product.id})">
@@ -115,7 +127,7 @@ class MainApp {
                     </button>
                     <button class="btn-product-action btn-cart-premium" 
                             onclick="appMain.addToCart(${product.id})"
-                            ${!product.available || product.stock <= 0 ? 'disabled' : ''}>
+                            ${!isAvailable ? 'disabled' : ''}>
                         <i class="fas fa-shopping-cart"></i> إضافة
                     </button>
                 </div>
@@ -125,43 +137,23 @@ class MainApp {
         return card;
     }
 
-    filterProducts(category) {
-        const products = document.querySelectorAll('.product-card-premium');
-        const filterButtons = document.querySelectorAll('.filter-btn');
-
-        // تحديث الأزرار النشطة
-        filterButtons.forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.getAttribute('onclick').includes(`'${category}'`)) {
-                btn.classList.add('active');
-            }
-        });
-
-        // فلتر المنتجات
-        products.forEach(product => {
-            if (category === 'all') {
-                product.style.display = 'block';
-            } else if (category === 'popular') {
-                product.style.display = product.dataset.category.includes('popular') ? 'block' : 'none';
-            } else if (category === 'new') {
-                product.style.display = product.dataset.category.includes('new') ? 'block' : 'none';
-            } else {
-                product.style.display = product.dataset.category.includes(category) ? 'block' : 'none';
-            }
-        });
-    }
-
     addToCart(productId) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product || !product.available || product.stock <= 0) {
-            this.showNotification('المنتج غير متوفر حالياً', 'error');
+        const product = simpleStorage.getProduct(productId);
+        if (!product) {
+            this.showAlert('المنتج غير موجود', 'error');
             return;
         }
 
+        if (!product.available || product.stock <= 0) {
+            this.showAlert('المنتج غير متوفر حالياً', 'error');
+            return;
+        }
+
+        // التحقق من وجود المنتج في العربة
         const existingItem = this.cart.find(item => item.id === productId);
         if (existingItem) {
             if (existingItem.quantity >= product.stock) {
-                this.showNotification('لا يمكن إضافة المزيد، الكمية المتاحة: ' + product.stock, 'warning');
+                this.showAlert('لا يمكن إضافة المزيد، الكمية المتاحة: ' + product.stock, 'warning');
                 return;
             }
             existingItem.quantity += 1;
@@ -176,71 +168,176 @@ class MainApp {
             });
         }
 
-        this.saveCartToStorage();
-        this.updateCartDisplay();
-        this.showNotification(`تم إضافة ${product.name} إلى العربة`, 'success');
+        this.saveCart();
+        this.updateCartUI();
+        this.showAlert(`تم إضافة ${product.name} إلى العربة`, 'success');
         
-        // إرسال حدث تحديث العربة
-        document.dispatchEvent(new Event('cartUpdated'));
+        // إظهار شريط الطلبات
+        this.showOrderBar();
     }
 
     removeFromCart(productId) {
         const index = this.cart.findIndex(item => item.id === productId);
         if (index !== -1) {
             this.cart.splice(index, 1);
-            this.saveCartToStorage();
-            this.updateCartDisplay();
-            document.dispatchEvent(new Event('cartUpdated'));
+            this.saveCart();
+            this.updateCartUI();
+            this.showAlert('تم إزالة المنتج من العربة', 'info');
         }
     }
 
-    updateCartDisplay() {
-        this.calculateTotal();
+    updateCartUI() {
+        const totalItems = this.cart.reduce((sum, item) => sum + item.quantity, 0);
+        const totalAmount = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         
         const orderBar = document.getElementById('orderBarPremium');
         const orderCount = document.getElementById('orderCountPremium');
         const orderTotal = document.getElementById('orderTotalPremium');
         const orderItems = document.getElementById('orderItemsPremium');
         
-        if (this.cart.length > 0) {
-            if (orderBar) orderBar.style.display = 'flex';
-            if (orderCount) orderCount.textContent = this.cart.reduce((sum, item) => sum + item.quantity, 0);
-            if (orderTotal) orderTotal.textContent = `${this.total.toFixed(2)} ${this.settings.currency || 'درهم'}`;
-            if (orderItems) {
-                const itemText = this.cart.length === 1 ? 'منتج واحد' : `${this.cart.length} منتجات`;
-                orderItems.textContent = itemText;
+        if (orderBar) {
+            if (totalItems > 0) {
+                orderBar.style.display = 'flex';
+                if (orderCount) orderCount.textContent = totalItems;
+                if (orderTotal) orderTotal.textContent = `${totalAmount.toFixed(2)} ${simpleStorage.getSettings().currency}`;
+                if (orderItems) {
+                    orderItems.textContent = totalItems === 1 ? 'منتج واحد' : `${totalItems} منتجات`;
+                }
+            } else {
+                orderBar.style.display = 'none';
             }
-        } else {
-            if (orderBar) orderBar.style.display = 'none';
         }
     }
 
-    calculateTotal() {
-        this.total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    }
-
-    saveCartToStorage() {
-        localStorage.setItem('goldenMalaysiaCart', JSON.stringify(this.cart));
-    }
-
-    loadCartFromStorage() {
-        const savedCart = localStorage.getItem('goldenMalaysiaCart');
-        if (savedCart) {
-            this.cart = JSON.parse(savedCart);
+    showOrderBar() {
+        const orderBar = document.getElementById('orderBarPremium');
+        if (orderBar) {
+            orderBar.style.display = 'flex';
+            setTimeout(() => {
+                orderBar.classList.add('show');
+            }, 10);
         }
+    }
+
+    showProductDetails(productId) {
+        const product = simpleStorage.getProduct(productId);
+        if (!product) return;
+
+        const modal = document.createElement('div');
+        modal.className = 'product-modal-overlay';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        `;
+
+        modal.innerHTML = `
+            <div class="product-modal" style="
+                background: white;
+                border-radius: 15px;
+                max-width: 800px;
+                width: 100%;
+                max-height: 90vh;
+                overflow-y: auto;
+                position: relative;
+                animation: modalSlideIn 0.3s ease;
+            ">
+                <button class="close-modal" onclick="this.closest('.product-modal-overlay').remove(); document.body.style.overflow='auto';" style="
+                    position: absolute;
+                    top: 15px;
+                    left: 15px;
+                    background: #f44336;
+                    color: white;
+                    border: none;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    font-size: 20px;
+                    cursor: pointer;
+                    z-index: 10;
+                ">×</button>
+                
+                <div style="display: flex; gap: 30px; padding: 30px;">
+                    <div style="flex: 1;">
+                        <img src="${product.image}" alt="${product.name}" style="
+                            width: 100%;
+                            height: 300px;
+                            object-fit: cover;
+                            border-radius: 10px;
+                            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                        ">
+                    </div>
+                    <div style="flex: 1;">
+                        <h2 style="color: #1A1A1A; margin-bottom: 10px;">${product.name}</h2>
+                        <div style="color: var(--emerald); font-weight: 600; margin-bottom: 20px;">
+                            ${product.brand}
+                        </div>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--gold); margin-bottom: 20px;">
+                            ${product.price} ${simpleStorage.getSettings().currency}
+                        </div>
+                        <p style="color: #666; line-height: 1.8; margin-bottom: 30px;">
+                            ${product.description}
+                        </p>
+                        <div style="margin-bottom: 20px;">
+                            <span style="background: ${product.available ? '#4CAF50' : '#f44336'}; color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9rem;">
+                                ${product.available ? 'متوفر' : 'غير متوفر'}
+                            </span>
+                            <span style="color: #666; margin-right: 15px;">المخزون: ${product.stock}</span>
+                        </div>
+                        <button onclick="appMain.addToCart(${product.id}); this.closest('.product-modal-overlay').remove();" 
+                                style="background: linear-gradient(45deg, var(--emerald), #4CAF50); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1.1rem;"
+                                ${!product.available || product.stock <= 0 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                            <i class="fas fa-cart-plus"></i> أضف إلى العربة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        document.body.style.overflow = 'hidden';
+
+        // إضافة الأنيميشن
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes modalSlideIn {
+                from { opacity: 0; transform: translateY(-50px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
     }
 
     openOrderModal() {
         if (this.cart.length === 0) {
-            this.showNotification('عربة التسوق فارغة', 'warning');
+            this.showAlert('عربة التسوق فارغة', 'warning');
             return;
         }
 
-        const modalContent = this.createOrderModalContent();
-        this.showModal(modalContent, 'order-modal');
-    }
+        const modal = document.createElement('div');
+        modal.className = 'order-modal-overlay';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        `;
 
-    createOrderModalContent() {
         let itemsHTML = '';
         this.cart.forEach((item, index) => {
             itemsHTML += `
@@ -248,10 +345,10 @@ class MainApp {
                     <img src="${item.image}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
                     <div style="flex: 1;">
                         <div style="font-weight: 700; color: #1A1A1A;">${item.name}</div>
-                        <div style="color: #666; font-size: 0.9rem;">${item.price} ${this.settings.currency} × ${item.quantity}</div>
+                        <div style="color: #666; font-size: 0.9rem;">${item.price} ${simpleStorage.getSettings().currency} × ${item.quantity}</div>
                     </div>
-                    <div style="font-weight: 700; color: #4361EE;">${(item.price * item.quantity).toFixed(2)} ${this.settings.currency}</div>
-                    <button onclick="appMain.removeFromCart(${item.id})" 
+                    <div style="font-weight: 700; color: #4361EE;">${(item.price * item.quantity).toFixed(2)} ${simpleStorage.getSettings().currency}</div>
+                    <button onclick="appMain.removeFromCart(${item.id}); appMain.refreshOrderModal();" 
                             style="background: #f44336; color: white; border: none; width: 30px; height: 30px; border-radius: 5px; cursor: pointer;">
                         <i class="fas fa-times"></i>
                     </button>
@@ -259,78 +356,109 @@ class MainApp {
             `;
         });
 
-        return `
-            <div style="max-width: 600px; padding: 20px;">
-                <h3 style="color: #1A1A1A; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
-                    <i class="fas fa-shopping-cart"></i> إتمام الطلب
-                </h3>
+        const settings = simpleStorage.getSettings();
+        const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const deliveryFee = settings.deliveryFee || 30;
+        const total = subtotal + deliveryFee;
+
+        modal.innerHTML = `
+            <div class="order-modal" style="
+                background: white;
+                border-radius: 15px;
+                max-width: 600px;
+                width: 100%;
+                max-height: 90vh;
+                overflow-y: auto;
+                position: relative;
+                animation: modalSlideIn 0.3s ease;
+            ">
+                <button class="close-modal" onclick="this.closest('.order-modal-overlay').remove(); document.body.style.overflow='auto';" style="
+                    position: absolute;
+                    top: 15px;
+                    left: 15px;
+                    background: #f44336;
+                    color: white;
+                    border: none;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    font-size: 20px;
+                    cursor: pointer;
+                    z-index: 10;
+                ">×</button>
                 
-                <div style="margin-bottom: 25px;">
-                    <h4 style="color: #4361EE; margin-bottom: 15px;">المنتجات المختارة</h4>
-                    ${itemsHTML}
-                </div>
-                
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>المجموع الفرعي:</span>
-                        <span><strong>${this.total.toFixed(2)} ${this.settings.currency}</strong></span>
+                <div style="padding: 30px;">
+                    <h2 style="color: #1A1A1A; margin-bottom: 25px; text-align: center;">
+                        <i class="fas fa-shopping-cart"></i> إتمام الطلب
+                    </h2>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #4361EE; margin-bottom: 15px;">المنتجات المختارة</h3>
+                        <div id="orderModalItems">${itemsHTML}</div>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>رسوم التوصيل:</span>
-                        <span><strong>${this.settings.deliveryFee || 30} ${this.settings.currency}</strong></span>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>المجموع الفرعي:</span>
+                            <span><strong>${subtotal.toFixed(2)} ${settings.currency}</strong></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>رسوم التوصيل:</span>
+                            <span><strong>${deliveryFee} ${settings.currency}</strong></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; padding-top: 10px; border-top: 2px solid #dee2e6;">
+                            <span>المجموع الإجمالي:</span>
+                            <span style="color: var(--emerald);">${total.toFixed(2)} ${settings.currency}</span>
+                        </div>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; padding-top: 10px; border-top: 2px solid #dee2e6;">
-                        <span>المجموع الإجمالي:</span>
-                        <span style="color: var(--emerald);">${(this.total + (this.settings.deliveryFee || 30)).toFixed(2)} ${this.settings.currency}</span>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #4361EE; margin-bottom: 15px;">معلومات العميل</h3>
+                        <div style="display: grid; gap: 15px;">
+                            <input type="text" id="customerName" placeholder="الاسم الكامل *" 
+                                   style="padding: 12px; border: 2px solid #eef2f7; border-radius: 8px; font-family: 'Tajawal', sans-serif;">
+                            <input type="tel" id="customerPhone" placeholder="رقم الهاتف *" 
+                                   style="padding: 12px; border: 2px solid #eef2f7; border-radius: 8px; font-family: 'Tajawal', sans-serif;">
+                            <textarea id="customerAddress" placeholder="العنوان التفصيلي" 
+                                      style="padding: 12px; border: 2px solid #eef2f7; border-radius: 8px; min-height: 80px; font-family: 'Tajawal', sans-serif;"></textarea>
+                        </div>
                     </div>
-                </div>
-                
-                <div style="margin-bottom: 25px;">
-                    <h4 style="color: #4361EE; margin-bottom: 15px;">معلومات العميل</h4>
-                    <div style="display: grid; gap: 15px;">
-                        <input type="text" id="customerName" placeholder="الاسم الكامل *" 
-                               style="padding: 12px; border: 2px solid #eef2f7; border-radius: 8px; font-family: 'Tajawal', sans-serif;">
-                        <input type="tel" id="customerPhone" placeholder="رقم الهاتف *" 
-                               style="padding: 12px; border: 2px solid #eef2f7; border-radius: 8px; font-family: 'Tajawal', sans-serif;">
-                        <textarea id="customerAddress" placeholder="العنوان التفصيلي" 
-                                  style="padding: 12px; border: 2px solid #eef2f7; border-radius: 8px; min-height: 80px; font-family: 'Tajawal', sans-serif;"></textarea>
-                        <select id="paymentMethod" style="padding: 12px; border: 2px solid #eef2f7; border-radius: 8px; font-family: 'Tajawal', sans-serif;">
-                            <option value="cash">نقداً عند الاستلام</option>
-                            <option value="card">دفع إلكتروني</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div style="display: flex; gap: 15px;">
-                    <button id="submitOrderBtn" 
-                            style="flex: 1; background: linear-gradient(45deg, var(--emerald), #4CAF50); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer;">
+                    
+                    <button onclick="appMain.submitOrder()" 
+                            style="background: linear-gradient(45deg, var(--emerald), #4CAF50); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1.1rem;">
                         <i class="fas fa-check-circle"></i> تأكيد الطلب
-                    </button>
-                    <button class="modal-close" 
-                            style="flex: 1; background: #f8f9fa; color: #666; border: 2px solid #e0e0e0; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer;">
-                        <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>
             </div>
         `;
+
+        document.body.appendChild(modal);
+        document.body.style.overflow = 'hidden';
+    }
+
+    refreshOrderModal() {
+        document.querySelector('.order-modal-overlay')?.remove();
+        this.openOrderModal();
     }
 
     submitOrder() {
-        const name = document.getElementById('customerName').value;
-        const phone = document.getElementById('customerPhone').value;
-        const address = document.getElementById('customerAddress').value;
-        const paymentMethod = document.getElementById('paymentMethod').value;
+        const name = document.getElementById('customerName')?.value;
+        const phone = document.getElementById('customerPhone')?.value;
+        const address = document.getElementById('customerAddress')?.value || '';
 
         if (!name || !phone) {
-            this.showNotification('يرجى إدخال الاسم ورقم الهاتف', 'error');
+            this.showAlert('يرجى إدخال الاسم ورقم الهاتف', 'error');
             return;
         }
+
+        const settings = simpleStorage.getSettings();
+        const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const deliveryFee = settings.deliveryFee || 30;
 
         const orderData = {
             customerName: name,
             customerPhone: phone,
             address: address,
-            paymentMethod: paymentMethod,
             items: this.cart.map(item => ({
                 productId: item.id,
                 productName: item.name,
@@ -338,41 +466,43 @@ class MainApp {
                 quantity: item.quantity,
                 total: item.price * item.quantity
             })),
-            subtotal: this.total,
-            deliveryFee: this.settings.deliveryFee || 30,
-            total: this.total + (this.settings.deliveryFee || 30),
+            subtotal: subtotal,
+            deliveryFee: deliveryFee,
+            total: subtotal + deliveryFee,
             status: 'new'
         };
 
-        const newOrder = simpleStorage.addOrder(orderData);
+        // حفظ الطلب
+        const order = simpleStorage.addOrder(orderData);
         
-        if (newOrder) {
+        if (order) {
             // إرسال رسالة واتساب
-            this.sendWhatsAppOrder(newOrder);
+            this.sendWhatsAppOrder(order);
             
             // تفريغ العربة
             this.cart = [];
-            this.saveCartToStorage();
-            this.updateCartDisplay();
+            this.saveCart();
+            this.updateCartUI();
             
             // إغلاق النافذة
-            this.closeModal();
+            document.querySelector('.order-modal-overlay')?.remove();
+            document.body.style.overflow = 'auto';
             
-            this.showNotification('تم إرسال طلبك بنجاح! سنتصل بك قريباً', 'success');
+            this.showAlert('تم إرسال طلبك بنجاح! سنتصل بك قريباً', 'success');
         } else {
-            this.showNotification('حدث خطأ في إرسال الطلب', 'error');
+            this.showAlert('حدث خطأ في إرسال الطلب', 'error');
         }
     }
 
     sendWhatsAppOrder(order) {
-        const whatsappNumber = this.settings.whatsappNumber || '+971501234567';
+        const whatsappNumber = simpleStorage.getSettings().whatsappNumber || '+971501234567';
         const message = `طلب جديد من موقع ماليزيا الذهبية\n\n` +
                        `الاسم: ${order.customerName}\n` +
                        `الهاتف: ${order.customerPhone}\n` +
                        `العنوان: ${order.address || 'لم يتم تحديد العنوان'}\n` +
-                       `طريقة الدفع: ${order.paymentMethod === 'cash' ? 'نقداً' : 'إلكتروني'}\n\n` +
+                       `طريقة الدفع: نقداً عند الاستلام\n\n` +
                        `المنتجات:\n${order.items.map(item => `- ${item.productName} (${item.quantity} × ${item.price})`).join('\n')}\n\n` +
-                       `المجموع: ${order.total} ${this.settings.currency}\n` +
+                       `المجموع: ${order.total} ${simpleStorage.getSettings().currency}\n` +
                        `رقم الطلب: ${order.orderNumber}`;
         
         const encodedMessage = encodeURIComponent(message);
@@ -382,177 +512,66 @@ class MainApp {
         window.open(whatsappURL, '_blank');
     }
 
-    showModal(content, modalId = 'modal') {
-        // إغلاق أي نافذة مفتوحة
-        this.closeModal();
-        
-        const modal = document.createElement('div');
-        modal.id = modalId;
-        modal.className = 'modal-overlay';
-        modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-        `;
-        
-        const modalContent = document.createElement('div');
-        modalContent.style.cssText = `
-            background: white;
-            border-radius: 15px;
-            max-width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        `;
-        modalContent.innerHTML = content;
-        
-        modal.appendChild(modalContent);
-        document.body.appendChild(modal);
-        document.body.style.overflow = 'hidden';
-        
-        // إضافة مستمع الحدث للزر بعد إنشاء النافذة
-        setTimeout(() => {
-            const submitBtn = document.getElementById('submitOrderBtn');
-            if (submitBtn) {
-                submitBtn.addEventListener('click', () => this.submitOrder());
-            }
-        }, 100);
-    }
-
-    closeModal() {
-        const existingModal = document.querySelector('.modal-overlay');
-        if (existingModal) {
-            existingModal.remove();
-            document.body.style.overflow = 'auto';
-        }
-    }
-
-    showProductDetails(productId) {
-        const product = this.products.find(p => p.id === productId);
-        if (!product) return;
-
-        const modalContent = `
-            <div style="max-width: 700px; padding: 20px;">
-                <div style="display: flex; gap: 30px; margin-bottom: 25px;">
-                    <img src="${product.image}" 
-                         style="width: 250px; height: 250px; border-radius: 12px; object-fit: cover;">
-                    <div style="flex: 1;">
-                        <div style="color: var(--emerald); font-weight: 600; margin-bottom: 10px;">
-                            <i class="fas fa-check-circle"></i> ${product.brand}
-                        </div>
-                        <h3 style="color: #1A1A1A; margin-bottom: 15px; font-size: 1.8rem;">${product.name}</h3>
-                        <div style="font-size: 2rem; font-weight: 800; color: var(--gold); margin-bottom: 20px;">
-                            ${product.price} ${this.settings.currency}
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <span class="status-badge ${product.available && product.stock > 0 ? 'status-active' : 'status-inactive'}">
-                                ${product.available && product.stock > 0 ? 'متوفر' : 'غير متوفر'}
-                            </span>
-                            <span style="color: #666; margin-right: 15px;">المخزون: ${product.stock}</span>
-                        </div>
-                        <button onclick="appMain.addToCart(${product.id})" 
-                                style="background: linear-gradient(45deg, var(--emerald), #4CAF50); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-weight: 700; cursor: pointer;"
-                                ${!product.available || product.stock <= 0 ? 'disabled' : ''}>
-                            <i class="fas fa-cart-plus"></i> أضف إلى العربة
-                        </button>
-                    </div>
-                </div>
-                
-                <div style="margin-bottom: 25px;">
-                    <h4 style="color: #4361EE; margin-bottom: 15px;">وصف المنتج</h4>
-                    <p style="color: #666; line-height: 1.8;">${product.description}</p>
-                </div>
-                
-                <div style="display: flex; gap: 15px;">
-                    <button onclick="appMain.closeModal()" 
-                            style="flex: 1; background: #4361EE; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer;">
-                        <i class="fas fa-check"></i> تم
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        this.showModal(modalContent, 'product-details-modal');
-    }
-
-    showNotification(message, type = 'success') {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
+    showAlert(message, type = 'info') {
+        const alert = document.createElement('div');
+        alert.style.cssText = `
             position: fixed;
             top: 20px;
             right: 20px;
-            background: ${type === 'success' ? '#2E8B57' : type === 'error' ? '#f44336' : '#4361EE'};
+            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : type === 'warning' ? '#FF9800' : '#2196F3'};
             color: white;
             padding: 15px 25px;
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            z-index: 1001;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            z-index: 9999;
             animation: slideIn 0.3s ease-out;
+            font-family: 'Tajawal', sans-serif;
+            min-width: 300px;
         `;
         
-        notification.innerHTML = `
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
-            <span>${message}</span>
+        alert.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+            <span style="margin-right: 10px;">${message}</span>
         `;
         
-        document.body.appendChild(notification);
+        document.body.appendChild(alert);
         
         // إزالة الإشعار بعد 3 ثوان
         setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease-out';
+            alert.style.animation = 'slideOut 0.3s ease-out';
             setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.remove();
+                if (alert.parentElement) {
+                    alert.remove();
                 }
             }, 300);
         }, 3000);
+        
+        // إضافة الأنيميشن إذا لم تكن موجودة
+        if (!document.getElementById('alert-animations')) {
+            const style = document.createElement('style');
+            style.id = 'alert-animations';
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
     }
 }
 
-// إنشاء نسخة عامة
+// إنشاء نسخة عالمية
 window.appMain = new MainApp();
 
-// إضافة الأنيميشن للإشعارات
-if (!document.getElementById('notification-styles')) {
-    const style = document.createElement('style');
-    style.id = 'notification-styles';
-    style.textContent = `
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-}
-
-// تهيئة التطبيق عند تحميل الصفحة
+// تشغيل التطبيق عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
-    window.appMain.init();
+    // تأخير بسيط للتأكد من تحميل كل شيء
+    setTimeout(() => {
+        window.appMain.init();
+    }, 100);
 });
