@@ -1,0 +1,26 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "قهوة الجانوديرما الفاخرة",
+      "brand": "DXN",
+      "price": 95,
+      "description": "خلطة فريدة من فطر الجانوديرما النادر مع أجود أنواع البن الماليزي",
+      "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+      "category": ["popular", "energy"],
+      "stock": 50,
+      "available": true,
+      "isPopular": true,
+      "isNew": false
+    }
+  ],
+  "orders": [],
+  "settings": {
+    "deliveryFee": 30,
+    "deliveryAreas": "abu-dhabi",
+    "deliveryTime": "24 ساعة",
+    "whatsappNumber": "+971501234567",
+    "instagramLink": "@malaysian_products"
+  },
+  "lastUpdate": "2024-03-15T10:00:00Z"
+}
