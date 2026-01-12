@@ -246,6 +246,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            text-decoration: none;
         }
         
         .btn-primary {
@@ -595,9 +596,144 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="simple-storage.js"></script>
     <script>
-        // main-functions.js - نسخة مبسطة
+        // بيانات المنتجات الافتراضية
+        const defaultProducts = [
+            {
+                id: 1,
+                name: "قهوة الجانوديرما",
+                brand: "DXN",
+                description: "قهوة صحية مع خلاصة فطر الجانوديرما لتقوية المناعة والطاقة",
+                price: 85,
+                image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: ["coffee", "popular", "health"],
+                available: true,
+                stock: 50
+            },
+            {
+                id: 2,
+                name: "كبسولات الجانوديرما",
+                brand: "DXN",
+                description: "كبسولات فطر الجانوديرما النقية لدعم الصحة العامة والمناعة",
+                price: 120,
+                image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?ixlib=rb-4.0.3&auto=format&fit=crop&w-800&q=80",
+                category: ["health", "popular"],
+                available: true,
+                stock: 30
+            },
+            {
+                id: 3,
+                name: "شاي سبيرولينا",
+                brand: "DXN",
+                description: "شاي عضوي مع سبيرولينا لإزالة السموم وتنقية الجسم",
+                price: 75,
+                image: "https://images.unsplash.com/photo-1561047029-3000c68339ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: ["health", "coffee"],
+                available: true,
+                stock: 40
+            },
+            {
+                id: 4,
+                name: "عسل المانوكا",
+                brand: "DXN",
+                description: "عسل مانوكا النيوزيلندي الأصلي لخصائصه المضادة للبكتيريا",
+                price: 150,
+                image: "https://images.unsplash.com/photo-1587049352851-8d4e89133924?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: ["health", "popular"],
+                available: true,
+                stock: 25
+            },
+            {
+                id: 5,
+                name: "مكمل RC",
+                brand: "DXN",
+                description: "مكمل ريحي كوريديس للجهاز التنفسي وصحة الرئتين",
+                price: 95,
+                image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: ["health"],
+                available: true,
+                stock: 35
+            },
+            {
+                id: 6,
+                name: "قهوة لينزي",
+                brand: "DXN",
+                description: "قهوة لينزي المميزة بمزيج من الأعشاب الطبيعية للطاقة",
+                price: 80,
+                image: "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: ["coffee", "popular"],
+                available: true,
+                stock: 45
+            }
+        ];
+
+        // إعدادات الموقع
+        const defaultSettings = {
+            currency: "درهم",
+            deliveryFee: 30,
+            whatsappNumber: "+971501234567",
+            storeName: "ماليزيا الذهبية"
+        };
+
+        // SimpleStorage الكائن البديل
+        window.simpleStorage = {
+            getProducts: function() {
+                try {
+                    const saved = localStorage.getItem('goldenMalaysia_products');
+                    return saved ? JSON.parse(saved) : defaultProducts;
+                } catch {
+                    return defaultProducts;
+                }
+            },
+            
+            getProduct: function(id) {
+                const products = this.getProducts();
+                return products.find(p => p.id == id);
+            },
+            
+            getSettings: function() {
+                try {
+                    const saved = localStorage.getItem('goldenMalaysia_settings');
+                    return saved ? JSON.parse(saved) : defaultSettings;
+                } catch {
+                    return defaultSettings;
+                }
+            },
+            
+            addOrder: function(orderData) {
+                try {
+                    // إنشاء رقم طلب
+                    const orderNumber = 'ORD-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                    const order = {
+                        ...orderData,
+                        orderNumber: orderNumber,
+                        date: new Date().toISOString(),
+                        id: Date.now()
+                    };
+                    
+                    // الحصول على الطلبات الحالية
+                    const orders = this.getOrders();
+                    orders.push(order);
+                    
+                    // حفظ الطلبات
+                    localStorage.setItem('goldenMalaysia_orders', JSON.stringify(orders));
+                    
+                    return order;
+                } catch (error) {
+                    console.error('Error saving order:', error);
+                    return null;
+                }
+            },
+            
+            getOrders: function() {
+                try {
+                    const saved = localStorage.getItem('goldenMalaysia_orders');
+                    return saved ? JSON.parse(saved) : [];
+                } catch {
+                    return [];
+                }
+            }
+        };
         
         class MainApp {
             constructor() {
@@ -614,14 +750,21 @@
             }
 
             loadCart() {
-                const savedCart = localStorage.getItem('goldenMalaysiaCart');
-                if (savedCart) {
-                    this.cart = JSON.parse(savedCart);
+                try {
+                    const savedCart = localStorage.getItem('goldenMalaysiaCart');
+                    this.cart = savedCart ? JSON.parse(savedCart) : [];
+                } catch (error) {
+                    console.error('Error loading cart:', error);
+                    this.cart = [];
                 }
             }
 
             saveCart() {
-                localStorage.setItem('goldenMalaysiaCart', JSON.stringify(this.cart));
+                try {
+                    localStorage.setItem('goldenMalaysiaCart', JSON.stringify(this.cart));
+                } catch (error) {
+                    console.error('Error saving cart:', error);
+                }
             }
 
             setupEventListeners() {
@@ -686,13 +829,17 @@
                             <div class="product-description">${product.description}</div>
                             <div class="product-footer">
                                 <div class="product-price">${product.price} ${settings.currency || 'درهم'}</div>
-                                <a href="product-details.html?id=${product.id}" class="btn btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-eye"></i> التفاصيل
-                                </a>
-                                        ${!isAvailable ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
-                                    <i class="fas ${!isAvailable ? 'fa-times' : 'fa-cart-plus'}"></i>
-                                    ${!isAvailable ? 'غير متوفر' : 'إضافة'}
-                                </button>
+                                <div style="display: flex; gap: 10px;">
+                                    <a href="product-details.html?id=${product.id}" class="btn btn-primary">
+                                        <i class="fas fa-eye"></i> التفاصيل
+                                    </a>
+                                    <button class="btn btn-success" 
+                                            onclick="appMain.addToCart(${product.id})"
+                                            ${!isAvailable ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                                        <i class="fas ${!isAvailable ? 'fa-times' : 'fa-cart-plus'}"></i>
+                                        ${!isAvailable ? 'غير متوفر' : 'إضافة'}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -800,7 +947,7 @@
                 
                 // عرض عناصر الطلب
                 let itemsHTML = '';
-                this.cart.forEach((item, index) => {
+                this.cart.forEach((item) => {
                     itemsHTML += `
                         <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: var(--radius); margin-bottom: 10px;">
                             <img src="${item.image}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
@@ -862,12 +1009,17 @@
             }
 
             submitOrder() {
-                const name = document.getElementById('customerName').value;
-                const phone = document.getElementById('customerPhone').value;
-                const address = document.getElementById('customerAddress').value || '';
+                const name = document.getElementById('customerName').value.trim();
+                const phone = document.getElementById('customerPhone').value.trim();
+                const address = document.getElementById('customerAddress').value.trim() || '';
 
                 if (!name || !phone) {
                     this.showAlert('يرجى إدخال الاسم ورقم الهاتف', 'error');
+                    return;
+                }
+
+                if (!/^[\d\s\+\-\(\)]+$/.test(phone)) {
+                    this.showAlert('يرجى إدخال رقم هاتف صحيح', 'error');
                     return;
                 }
 
@@ -890,7 +1042,8 @@
                     deliveryFee: deliveryFee,
                     total: subtotal + deliveryFee,
                     paymentMethod: 'cash',
-                    status: 'new'
+                    status: 'new',
+                    date: new Date().toISOString()
                 };
 
                 // حفظ الطلب
@@ -915,17 +1068,18 @@
             }
 
             sendWhatsAppOrder(order) {
-                const whatsappNumber = simpleStorage.getSettings().whatsappNumber || '+966553166315';
+                const whatsappNumber = simpleStorage.getSettings().whatsappNumber || '+971501234567';
                 const settings = simpleStorage.getSettings();
                 
-                const message = `طلب جديد من موقع ماليزيا الذهبية\n\n` +
-                               `الاسم: ${order.customerName}\n` +
-                               `الهاتف: ${order.customerPhone}\n` +
-                               `العنوان: ${order.address || 'لم يتم تحديد العنوان'}\n` +
-                               `طريقة الدفع: نقداً عند الاستلام\n\n` +
-                               `المنتجات:\n${order.items.map(item => `- ${item.productName} (${item.quantity} × ${item.price})`).join('\n')}\n\n` +
-                               `المجموع: ${order.total} ${settings.currency}\n` +
-                               `رقم الطلب: ${order.orderNumber}`;
+                const message = `📦 طلب جديد من موقع ماليزيا الذهبية\n\n` +
+                               `👤 الاسم: ${order.customerName}\n` +
+                               `📱 الهاتف: ${order.customerPhone}\n` +
+                               `📍 العنوان: ${order.address || 'لم يتم تحديد العنوان'}\n` +
+                               `💵 طريقة الدفع: نقداً عند الاستلام\n\n` +
+                               `🛒 المنتجات:\n${order.items.map(item => `- ${item.productName} (${item.quantity} × ${item.price} ${settings.currency})`).join('\n')}\n\n` +
+                               `💰 المجموع: ${order.total} ${settings.currency}\n` +
+                               `📋 رقم الطلب: ${order.orderNumber}\n` +
+                               `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}`;
                 
                 const encodedMessage = encodeURIComponent(message);
                 const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
@@ -949,24 +1103,17 @@
                     animation: slideIn 0.3s ease-out;
                     font-family: 'Tajawal', sans-serif;
                     min-width: 300px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
                 `;
                 
                 alert.innerHTML = `
                     <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
-                    <span style="margin-right: 10px;">${message}</span>
+                    <span>${message}</span>
                 `;
                 
                 document.body.appendChild(alert);
-                
-                // إزالة الإشعار بعد 3 ثوان
-                setTimeout(() => {
-                    alert.style.animation = 'slideOut 0.3s ease-out';
-                    setTimeout(() => {
-                        if (alert.parentElement) {
-                            alert.remove();
-                        }
-                    }, 300);
-                }, 3000);
                 
                 // إضافة الأنيميشن إذا لم تكن موجودة
                 if (!document.getElementById('alert-animations')) {
@@ -984,6 +1131,16 @@
                     `;
                     document.head.appendChild(style);
                 }
+                
+                // إزالة الإشعار بعد 3 ثوان
+                setTimeout(() => {
+                    alert.style.animation = 'slideOut 0.3s ease-out';
+                    setTimeout(() => {
+                        if (alert.parentElement) {
+                            alert.remove();
+                        }
+                    }, 300);
+                }, 3000);
             }
         }
 
@@ -1001,13 +1158,11 @@
 
         // تشغيل التطبيق عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', () => {
+            // تأخير بسيط للتأكد من تحميل كل شيء
             setTimeout(() => {
-                window.appMain.init();
                 console.log('✅ موقع ماليزيا الذهبية جاهز للعمل');
             }, 100);
         });
     </script>
 </body>
 </html>
-
-
