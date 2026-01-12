@@ -1,0 +1,25 @@
+{
+  "name": "golden-malaysia",
+  "version": "1.0.0",
+  "description": "موقع ماليزيا الذهبية - متجر إلكتروني لمنتجات DXN الصحية",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx live-server ."
+  },
+  "keywords": [
+    "malaysia",
+    "dxn",
+    "health",
+    "ecommerce",
+    "uae"
+  ],
+  "author": "Golden Malaysia Team",
+  "license": "MIT",
+  "dependencies": {
+    "serve": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
