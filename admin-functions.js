@@ -96,6 +96,328 @@ class AdminApp {
                 e.preventDefault();
                 this.showOrderModal();
             });
+            showOrderModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+    `;
+    
+    const products = simpleStorage.getProducts().filter(p => p.available && p.stock > 0);
+    let productsOptions = '<option value="">اختر منتج</option>';
+    products.forEach(product => {
+        productsOptions += `<option value="${product.id}">${product.name} - ${product.price} ${this.settings.currency}</option>`;
+    });
+    
+    modal.innerHTML = `
+        <div class="modal-container" style="
+            background: white;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        ">
+            <div class="modal-header" style="
+                padding: 25px 30px;
+                border-bottom: 1px solid #eef2f7;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            ">
+                <h3 style="color: var(--dark); font-size: 1.5rem;">
+                    <i class="fas fa-cart-plus"></i> إنشاء طلب جديد
+                </h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove();" style="
+                    background: none;
+                    border: none;
+                    font-size: 1.5rem;
+                    color: #999;
+                    cursor: pointer;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                ">&times;</button>
+            </div>
+            
+            <div class="modal-body" style="padding: 30px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark);">اسم العميل *</label>
+                        <input type="text" id="modalCustomerName" class="form-control" placeholder="أدخل اسم العميل">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark);">رقم الهاتف *</label>
+                        <input type="tel" id="modalCustomerPhone" class="form-control" placeholder="أدخل رقم الهاتف">
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark);">العنوان</label>
+                    <textarea id="modalCustomerAddress" class="form-control" rows="3" placeholder="أدخل العنوان التفصيلي"></textarea>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <label style="font-weight: 600; color: var(--dark);">المنتجات المطلوبة</label>
+                        <button type="button" id="addOrderItemBtn" style="background: #4361EE; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-plus"></i> إضافة منتج
+                        </button>
+                    </div>
+                    
+                    <div id="orderItemsList" style="background: #f8f9fa; border-radius: 8px; padding: 15px; min-height: 100px;">
+                        <p style="color: #666; text-align: center;">لم يتم إضافة منتجات</p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark);">طريقة الدفع</label>
+                        <select id="modalPaymentMethod" class="form-control">
+                            <option value="cash">نقداً عند الاستلام</option>
+                            <option value="card">دفع إلكتروني</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark);">رسوم التوصيل</label>
+                        <input type="number" id="modalDeliveryFee" class="form-control" value="${this.settings.deliveryFee || 30}">
+                    </div>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>المجموع الفرعي:</span>
+                        <span id="modalSubtotal">0.00 ${this.settings.currency}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>رسوم التوصيل:</span>
+                        <span id="modalDeliveryDisplay">${this.settings.deliveryFee || 30} ${this.settings.currency}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; padding-top: 10px; border-top: 2px solid #dee2e6;">
+                        <span>المجموع الإجمالي:</span>
+                        <span id="modalTotal" style="color: var(--success);">${this.settings.deliveryFee || 30} ${this.settings.currency}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer" style="
+                padding: 25px 30px;
+                border-top: 1px solid #eef2f7;
+                display: flex;
+                justify-content: flex-end;
+                gap: 15px;
+            ">
+                <button onclick="this.closest('.modal-overlay').remove();" 
+                        style="background: #f8f9fa; color: #666; border: 2px solid #e0e0e0; padding: 12px 24px; border-radius: var(--radius-md); cursor: pointer;">
+                    إلغاء
+                </button>
+                <button onclick="appAdmin.saveManualOrder()" 
+                        style="background: linear-gradient(45deg, var(--primary), #6C63FF); color: white; border: none; padding: 12px 24px; border-radius: var(--radius-md); cursor: pointer;">
+                    <i class="fas fa-save"></i> إنشاء الطلب
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // إضافة الأنيميشن
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eef2f7;
+            border-radius: var(--radius-md);
+            font-family: 'Tajawal', sans-serif;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // إضافة مستمعي الأحداث بعد إنشاء النافذة
+    setTimeout(() => {
+        const addItemBtn = document.getElementById('addOrderItemBtn');
+        if (addItemBtn) {
+            addItemBtn.addEventListener('click', () => this.addOrderItem());
+        }
+        
+        const deliveryInput = document.getElementById('modalDeliveryFee');
+        if (deliveryInput) {
+            deliveryInput.addEventListener('input', () => this.calculateManualOrderTotal());
+        }
+    }, 100);
+}
+
+addOrderItem() {
+    const container = document.getElementById('orderItemsList');
+    if (!container) return;
+    
+    const products = simpleStorage.getProducts().filter(p => p.available && p.stock > 0);
+    let productsOptions = '<option value="">اختر منتج</option>';
+    products.forEach(product => {
+        productsOptions += `<option value="${product.id}" data-price="${product.price}">${product.name} - ${product.price} ${this.settings.currency}</option>`;
+    });
+    
+    const itemHTML = `
+        <div class="order-item" style="display: flex; align-items: center; gap: 15px; padding: 10px; background: white; border-radius: 5px; margin-bottom: 10px;">
+            <div style="flex: 1;">
+                <select class="order-item-product" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;" onchange="appAdmin.updateOrderItemPrice(this)">
+                    ${productsOptions}
+                </select>
+            </div>
+            <div style="width: 100px;">
+                <input type="number" class="order-item-quantity" 
+                       style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;" 
+                       value="1" min="1" oninput="appAdmin.calculateManualOrderTotal()" placeholder="الكمية">
+            </div>
+            <div style="width: 120px; text-align: left; font-weight: 600; color: #1A1A1A;">
+                <span class="order-item-price">0.00 ${this.settings.currency}</span>
+            </div>
+            <button type="button" class="remove-order-item" 
+                    style="background: #f44336; color: white; border: none; width: 30px; height: 30px; border-radius: 5px; cursor: pointer;"
+                    onclick="this.closest('.order-item').remove(); appAdmin.calculateManualOrderTotal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    if (container.innerHTML.includes('لم يتم إضافة منتجات')) {
+        container.innerHTML = itemHTML;
+    } else {
+        container.insertAdjacentHTML('beforeend', itemHTML);
+    }
+    
+    this.calculateManualOrderTotal();
+}
+
+updateOrderItemPrice(selectElement) {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const price = selectedOption.dataset.price || 0;
+    const quantityInput = selectElement.closest('.order-item').querySelector('.order-item-quantity');
+    const priceSpan = selectElement.closest('.order-item').querySelector('.order-item-price');
+    
+    priceSpan.textContent = `${(price * (quantityInput.value || 1)).toFixed(2)} ${this.settings.currency}`;
+    this.calculateManualOrderTotal();
+}
+
+calculateManualOrderTotal() {
+    let subtotal = 0;
+    
+    document.querySelectorAll('.order-item').forEach(item => {
+        const select = item.querySelector('.order-item-product');
+        const quantityInput = item.querySelector('.order-item-quantity');
+        const selectedOption = select.options[select.selectedIndex];
+        
+        if (selectedOption.value) {
+            const price = parseFloat(selectedOption.dataset.price || 0);
+            const quantity = parseFloat(quantityInput.value || 1);
+            subtotal += price * quantity;
+        }
+    });
+    
+    const deliveryFee = parseFloat(document.getElementById('modalDeliveryFee')?.value || this.settings.deliveryFee || 30);
+    const total = subtotal + deliveryFee;
+    
+    document.getElementById('modalSubtotal').textContent = `${subtotal.toFixed(2)} ${this.settings.currency}`;
+    document.getElementById('modalDeliveryDisplay').textContent = `${deliveryFee.toFixed(2)} ${this.settings.currency}`;
+    document.getElementById('modalTotal').textContent = `${total.toFixed(2)} ${this.settings.currency}`;
+}
+
+saveManualOrder() {
+    const customerName = document.getElementById('modalCustomerName')?.value;
+    const customerPhone = document.getElementById('modalCustomerPhone')?.value;
+    const customerAddress = document.getElementById('modalCustomerAddress')?.value || '';
+    const paymentMethod = document.getElementById('modalPaymentMethod')?.value || 'cash';
+    const deliveryFee = parseFloat(document.getElementById('modalDeliveryFee')?.value || this.settings.deliveryFee || 30);
+    
+    // جمع عناصر الطلب
+    const items = [];
+    document.querySelectorAll('.order-item').forEach(item => {
+        const select = item.querySelector('.order-item-product');
+        const quantityInput = item.querySelector('.order-item-quantity');
+        const selectedOption = select.options[select.selectedIndex];
+        
+        if (selectedOption.value) {
+            const productId = parseInt(selectedOption.value);
+            const product = simpleStorage.getProduct(productId);
+            const quantity = parseInt(quantityInput.value) || 1;
+            
+            if (product && quantity > 0) {
+                items.push({
+                    productId: productId,
+                    productName: product.name,
+                    price: product.price,
+                    quantity: quantity,
+                    total: product.price * quantity
+                });
+            }
+        }
+    });
+    
+    // التحقق من البيانات
+    if (!customerName || !customerPhone) {
+        this.showAlert('يرجى إدخال اسم العميل ورقم الهاتف', 'error');
+        return;
+    }
+    
+    if (items.length === 0) {
+        this.showAlert('يرجى إضافة منتجات على الأقل للطلب', 'error');
+        return;
+    }
+    
+    // حساب المجاميع
+    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+    const total = subtotal + deliveryFee;
+    
+    const orderData = {
+        customerName: customerName,
+        customerPhone: customerPhone,
+        address: customerAddress,
+        paymentMethod: paymentMethod,
+        items: items,
+        subtotal: subtotal,
+        deliveryFee: deliveryFee,
+        total: total,
+        status: 'new'
+    };
+    
+    // حفظ الطلب
+    const newOrder = simpleStorage.addOrder(orderData);
+    
+    if (newOrder) {
+        this.showAlert('تم إنشاء الطلب بنجاح', 'success');
+        this.loadData();
+        if (this.currentTab === 'orders') {
+            this.renderOrdersTable();
+        }
+        this.renderDashboard();
+        
+        // إغلاق النافذة
+        document.querySelector('.modal-overlay')?.remove();
+    } else {
+        this.showAlert('فشل في إنشاء الطلب', 'error');
+    }
+}
         }
     }
 
