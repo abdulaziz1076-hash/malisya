@@ -994,4 +994,115 @@ class AdminApp {
                             <div style="color: var(--primary); font-size: 2rem; margin-bottom: 10px;">
                                 <i class="fas fa-plus-circle"></i>
                             </div>
-                            <div style="font
+                            <div style="font-weight: 700; color: var(--dark);">إضافة منتج</div>
+                            <div style="font-size: 0.9rem; color: #666;">أضف منتج جديد للمتجر</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px; cursor: pointer;"
+                             onclick="appAdmin.exportData()">
+                            <div style="color: var(--success); font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-file-export"></i>
+                            </div>
+                            <div style="font-weight: 700; color: var(--dark);">تصدير البيانات</div>
+                            <div style="font-size: 0.9rem; color: #666;">تصدير الطلبات والمنتجات</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    }
+
+    exportData() {
+        const data = {
+            products: this.products,
+            orders: this.orders,
+            settings: this.settings,
+            exportDate: new Date().toISOString()
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `golden-malaysia-backup-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        this.showAlert('تم تصدير البيانات بنجاح', 'success');
+        document.querySelector('.modal-overlay')?.remove();
+    }
+
+    refreshData() {
+        if (this.currentTab === 'dashboard') {
+            this.loadData();
+            this.updateStatsCards();
+        }
+    }
+
+    showAlert(message, type = 'success') {
+        const alert = document.createElement('div');
+        alert.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            animation: slideIn 0.3s ease-out;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            min-width: 300px;
+        `;
+        
+        alert.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+            <span style="margin-right: 10px;">${message}</span>
+        `;
+        
+        document.body.appendChild(alert);
+        
+        // إزالة الإشعار بعد 3 ثوان
+        setTimeout(() => {
+            alert.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.remove();
+                }
+            }, 300);
+        }, 3000);
+        
+        // إضافة الأنيميشن إذا لم تكن موجودة
+        if (!document.getElementById('admin-alert-animations')) {
+            const style = document.createElement('style');
+            style.id = 'admin-alert-animations';
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+}
+
+// إنشاء نسخة عالمية
+window.appAdmin = new AdminApp();
+
+// تشغيل التطبيق عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', () => {
+    // تأخير بسيط للتأكد من تحميل كل شيء
+    setTimeout(() => {
+        window.appAdmin.init();
+    }, 100);
+});
