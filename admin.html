@@ -1053,4 +1053,360 @@
                                  style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
                         </td>
                         <td>
-                            <div style="font-weight: 700
+                            <div style="font-weight: 700;">${product.name}</div>
+                            <div style="font-size: 0.8rem; color: #666;">${product.brand}</div>
+                        </td>
+                        <td><strong>${product.price} ${this.settings.currency}</strong></td>
+                        <td>${product.stock}</td>
+                        <td>
+                            <span class="status-badge ${isAvailable ? 'status-active' : 'status-inactive'}">
+                                ${isAvailable ? 'متوفر' : 'غير متوفر'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="appAdmin.editProduct(${product.id})" style="margin-bottom: 5px;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="appAdmin.deleteProduct(${product.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                if (this.products.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 30px; color: #666;">
+                                <i class="fas fa-box-open" style="font-size: 2rem; color: #dee2e6; margin-bottom: 10px; display: block;"></i>
+                                لا توجد منتجات
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+
+            editProduct(productId) {
+                this.showProductModal(productId);
+            }
+
+            deleteProduct(productId) {
+                if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
+                
+                const success = simpleStorage.deleteProduct(productId);
+                if (success) {
+                    this.showAlert('تم حذف المنتج بنجاح', 'success');
+                    this.loadData();
+                    this.renderProductsTable();
+                    this.renderDashboard();
+                } else {
+                    this.showAlert('فشل في حذف المنتج', 'error');
+                }
+            }
+
+            renderOrdersTable() {
+                const tbody = document.getElementById('ordersTable');
+                if (!tbody) return;
+                
+                this.filterOrders('all');
+            }
+
+            filterOrders(status) {
+                const tbody = document.getElementById('ordersTable');
+                if (!tbody) return;
+                
+                tbody.innerHTML = '';
+                
+                let filteredOrders = this.orders;
+                if (status !== 'all') {
+                    filteredOrders = this.orders.filter(order => order.status === status);
+                }
+                
+                filteredOrders.forEach(order => {
+                    const orderDate = order.orderDate ? new Date(order.orderDate) : new Date();
+                    const formattedDate = orderDate.toLocaleDateString('ar-EG');
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${order.orderNumber || `ORD-${order.id}`}</strong></td>
+                        <td>
+                            <div style="font-weight: 700;">${order.customerName}</div>
+                            <div style="font-size: 0.8rem; color: #666;">${order.customerPhone}</div>
+                        </td>
+                        <td>${formattedDate}</td>
+                        <td><strong>${order.total ? order.total.toFixed(2) : '0.00'} ${this.settings.currency}</strong></td>
+                        <td>${order.paymentMethod === 'cash' ? 'نقداً' : 'إلكتروني'}</td>
+                        <td>
+                            <span class="status-badge ${this.getOrderStatusClass(order.status)}">
+                                ${this.getOrderStatusText(order.status)}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="appAdmin.viewOrder(${order.id})" style="margin-bottom: 5px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="appAdmin.editOrderStatus(${order.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                if (filteredOrders.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 30px; color: #666;">
+                                <i class="fas fa-shopping-cart" style="font-size: 2rem; color: #dee2e6; margin-bottom: 10px; display: block;"></i>
+                                ${status === 'all' ? 'لا توجد طلبات' : `لا توجد طلبات بحالة "${this.getOrderStatusText(status)}"`}
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+
+            getOrderStatusClass(status) {
+                const classes = {
+                    'new': 'status-pending',
+                    'processing': 'status-active',
+                    'delivered': 'status-active',
+                    'cancelled': 'status-inactive'
+                };
+                return classes[status] || 'status-pending';
+            }
+
+            getOrderStatusText(status) {
+                const texts = {
+                    'new': 'جديد',
+                    'processing': 'قيد المعالجة',
+                    'delivered': 'تم التسليم',
+                    'cancelled': 'ملغي'
+                };
+                return texts[status] || status;
+            }
+
+            viewOrder(orderId) {
+                const order = simpleStorage.getOrder(orderId);
+                if (!order) return;
+                
+                const orderDate = order.orderDate ? new Date(order.orderDate) : new Date();
+                const formattedDate = orderDate.toLocaleDateString('ar-EG');
+                
+                let itemsHTML = '';
+                if (order.items && order.items.length > 0) {
+                    order.items.forEach(item => {
+                        itemsHTML += `
+                            <div style="display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 5px; margin-bottom: 5px;">
+                                <span>${item.productName}</span>
+                                <span>${item.quantity} × ${item.price} ${this.settings.currency}</span>
+                            </div>
+                        `;
+                    });
+                }
+                
+                const modalHTML = `
+                    <div class="modal-container" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h3><i class="fas fa-file-invoice"></i> تفاصيل الطلب</h3>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove();">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>رقم الطلب:</strong> ${order.orderNumber || `ORD-${order.id}`}</p>
+                            <p><strong>العميل:</strong> ${order.customerName}</p>
+                            <p><strong>الهاتف:</strong> ${order.customerPhone}</p>
+                            <p><strong>العنوان:</strong> ${order.address || 'لم يتم تحديد العنوان'}</p>
+                            <p><strong>التاريخ:</strong> ${formattedDate}</p>
+                            <p><strong>الحالة:</strong> <span class="status-badge ${this.getOrderStatusClass(order.status)}">${this.getOrderStatusText(order.status)}</span></p>
+                            
+                            <h4 style="margin-top: 20px;">المنتجات:</h4>
+                            ${itemsHTML || '<p>لا توجد منتجات</p>'}
+                            
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>المجموع:</span>
+                                    <span><strong>${order.total ? order.total.toFixed(2) : '0.00'} ${this.settings.currency}</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                this.showCustomModal(modalHTML);
+            }
+
+            editOrderStatus(orderId) {
+                const order = simpleStorage.getOrder(orderId);
+                if (!order) return;
+                
+                const modalHTML = `
+                    <div class="modal-container" style="max-width: 400px;">
+                        <div class="modal-header">
+                            <h3><i class="fas fa-edit"></i> تغيير حالة الطلب</h3>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove();">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="form-label">حالة الطلب الجديدة</label>
+                                <select id="newOrderStatus" class="form-control">
+                                    <option value="new" ${order.status === 'new' ? 'selected' : ''}>جديد</option>
+                                    <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>قيد المعالجة</option>
+                                    <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>تم التسليم</option>
+                                    <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>ملغي</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn" onclick="this.closest('.modal-overlay').remove();">إلغاء</button>
+                            <button class="btn btn-primary" onclick="appAdmin.updateOrderStatus(${orderId})">حفظ</button>
+                        </div>
+                    </div>
+                `;
+                
+                this.showCustomModal(modalHTML);
+            }
+
+            updateOrderStatus(orderId) {
+                const newStatus = document.getElementById('newOrderStatus').value;
+                
+                const success = simpleStorage.updateOrder(orderId, { status: newStatus });
+                
+                if (success) {
+                    this.showAlert('تم تحديث حالة الطلب بنجاح', 'success');
+                    this.loadData();
+                    this.renderOrdersTable();
+                    this.renderDashboard();
+                    this.closeModal();
+                } else {
+                    this.showAlert('فشل في تحديث حالة الطلب', 'error');
+                }
+            }
+
+            showQuickActions() {
+                const modal = document.getElementById('quickActionModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                }
+            }
+
+            exportData() {
+                const data = {
+                    products: this.products,
+                    orders: this.orders,
+                    settings: this.settings,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `golden-malaysia-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.showAlert('تم تصدير البيانات بنجاح', 'success');
+            }
+
+            refreshData() {
+                this.loadData();
+                if (this.currentTab === 'dashboard') {
+                    this.updateStatsCards();
+                    this.updateBadges();
+                }
+            }
+
+            closeModal() {
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            }
+
+            showCustomModal(content) {
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0,0,0,0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                    padding: 20px;
+                `;
+                modal.innerHTML = content;
+                document.body.appendChild(modal);
+            }
+
+            showAlert(message, type = 'success') {
+                const alert = document.createElement('div');
+                alert.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 8px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                    z-index: 9999;
+                    animation: slideIn 0.3s ease-out;
+                    font-family: 'Tajawal', sans-serif;
+                    min-width: 300px;
+                `;
+                
+                alert.innerHTML = `
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                    <span style="margin-right: 10px;">${message}</span>
+                `;
+                
+                document.body.appendChild(alert);
+                
+                // إزالة الإشعار بعد 3 ثوان
+                setTimeout(() => {
+                    alert.style.animation = 'slideOut 0.3s ease-out';
+                    setTimeout(() => {
+                        if (alert.parentElement) {
+                            alert.remove();
+                        }
+                    }, 300);
+                }, 3000);
+                
+                // إضافة الأنيميشن إذا لم تكن موجودة
+                if (!document.getElementById('alert-animations')) {
+                    const style = document.createElement('style');
+                    style.id = 'alert-animations';
+                    style.textContent = `
+                        @keyframes slideIn {
+                            from { transform: translateX(100%); opacity: 0; }
+                            to { transform: translateX(0); opacity: 1; }
+                        }
+                        @keyframes slideOut {
+                            from { transform: translateX(0); opacity: 1; }
+                            to { transform: translateX(100%); opacity: 0; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+        }
+
+        // إنشاء نسخة عالمية
+        window.appAdmin = new AdminApp();
+
+        // تشغيل التطبيق عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                window.appAdmin.init();
+                console.log('✅ لوحة التحكم جاهزة للعمل');
+            }, 100);
+        });
+    </script>
+</body>
+</html>
