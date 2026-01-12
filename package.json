@@ -1,25 +1,64 @@
 {
   "name": "golden-malaysia",
   "version": "1.0.0",
-  "description": "موقع ماليزيا الذهبية - متجر إلكتروني لمنتجات DXN الصحية",
+  "description": "موقع ماليزيا الذهبية - متجر إلكتروني متخصص في منتجات DXN الصحية والماليزية الفاخرة",
   "main": "index.html",
   "scripts": {
-    "start": "npx serve .",
-    "dev": "npx live-server ."
+    "start": "npx serve . -p 3000",
+    "dev": "npx live-server . --port=3000 --host=localhost",
+    "build": "echo 'No build step required for static site'",
+    "deploy": "echo 'Add deployment script here'",
+    "test": "echo 'No tests configured'",
+    "format": "npx prettier --write .",
+    "lint": "npx eslint . --fix"
   },
   "keywords": [
     "malaysia",
     "dxn",
     "health",
     "ecommerce",
-    "uae"
+    "uae",
+    "arabic",
+    "قهوة",
+    "جانوديرما",
+    "متجر",
+    "إلكتروني"
   ],
-  "author": "Golden Malaysia Team",
+  "author": {
+    "name": "Golden Malaysia Team",
+    "email": "info@malaysian-products.ae",
+    "url": "https://malaysian-products.ae"
+  },
   "license": "MIT",
   "dependencies": {
-    "serve": "^14.0.0"
+    "serve": "^14.2.1",
+    "live-server": "^1.2.2"
+  },
+  "devDependencies": {
+    "prettier": "^3.1.0",
+    "eslint": "^8.54.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "browserslist": [
+    "> 0.5%",
+    "last 2 versions",
+    "Firefox ESR",
+    "not dead"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/golden-malaysia.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/golden-malaysia/issues"
+  },
+  "homepage": "https://malaysian-products.ae",
+  "private": true,
+  "config": {
+    "port": 3000,
+    "api_url": "https://api.malaysian-products.ae"
   }
 }
