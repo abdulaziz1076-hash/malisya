@@ -461,4 +461,349 @@ class MainApp {
                         <span>التوصيل في ${this.settings.deliveryAreas === 'abu-dhabi' ? 'أبوظبي فقط' : 'جميع مناطق الإمارات'} خلال ${this.settings.deliveryTime}</span>
                     </div>
                     <div id="map" style="height: 300px; border-radius: 10px; border: 2px solid #eef2f7;"></div>
-                    <button onclick="mainApp.useCurrentLocation
+                    <button onclick="mainApp.useCurrentLocation()" style="margin-top: 15px; background: #f8f9fa; border: 2px solid #eef2f7; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                        <i class="fas fa-location-arrow"></i> استخدام موقعي الحالي
+                    </button>
+                </div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #1A1A1A; margin-bottom: 15px;">
+                        <i class="fas fa-credit-card"></i> طريقة الدفع
+                    </h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div style="border: 2px solid #4361EE; border-radius: 10px; padding: 20px; background: rgba(67, 97, 238, 0.05); cursor: pointer;" onclick="mainApp.selectPayment('cash')">
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                                <div style="width: 40px; height: 40px; background: #4361EE; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #1A1A1A;">الدفع عند الاستلام</div>
+                                    <div style="color: #666; font-size: 0.9rem;">ادفع نقداً عند استلام الطلب</div>
+                                </div>
+                            </div>
+                            <div style="color: #D32F2F; font-size: 0.9rem; margin-top: 10px;">
+                                <i class="fas fa-exclamation-triangle"></i> يرجى توفير المبلغ بالضبط
+                            </div>
+                        </div>
+                        <div style="border: 2px solid #eef2f7; border-radius: 10px; padding: 20px; background: #f8f9fa; opacity: 0.6;">
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                                <div style="width: 40px; height: 40px; background: #666; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #666;">الدفع الإلكتروني</div>
+                                    <div style="color: #999; font-size: 0.9rem;">قيد التطوير - قريباً</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: #f0f7f0; padding: 20px; border-radius: 12px; border-right: 4px solid #2E8B57; margin-bottom: 30px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>المجموع الجزئي:</span>
+                        <span><strong>${subtotal.toFixed(2)} ${this.settings.currency}</strong></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>رسوم التوصيل:</span>
+                        <span><strong>${deliveryFee.toFixed(2)} ${this.settings.currency}</strong></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: 800; padding-top: 15px; border-top: 2px solid #ddd;">
+                        <span>المجموع الإجمالي:</span>
+                        <span style="color: #2E8B57;">${total.toFixed(2)} ${this.settings.currency}</span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 15px;">
+                    <button onclick="mainApp.submitOrder()" 
+                            style="flex: 1; background: linear-gradient(45deg, #2E8B57, #4CAF50); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 1.1rem;">
+                        <i class="fas fa-paper-plane"></i> إرسال الطلب
+                    </button>
+                    <button onclick="mainApp.closeCurrentModal()" 
+                            style="flex: 1; background: #f8f9fa; color: #666; border: 2px solid #e0e0e0; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 1.1rem;">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    initMap() {
+        if (this.isMapInitialized) return;
+        
+        const mapElement = document.getElementById('map');
+        if (!mapElement) return;
+        
+        // مركز أبوظبي
+        const abuDhabiCenter = [24.4539, 54.3773];
+        
+        try {
+            this.map = L.map(mapElement).setView(abuDhabiCenter, 12);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(this.map);
+            
+            this.marker = L.marker(abuDhabiCenter, {
+                draggable: true
+            }).addTo(this.map);
+            
+            this.isMapInitialized = true;
+        } catch (error) {
+            console.error('خطأ في تحميل الخريطة:', error);
+        }
+    }
+
+    useCurrentLocation() {
+        if (!navigator.geolocation) {
+            this.showNotification('المتصفح لا يدعم تحديد الموقع', 'error');
+            return;
+        }
+        
+        this.showNotification('جاري تحديد موقعك...', 'info');
+        
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                
+                if (this.map && this.marker) {
+                    const newLatLng = [latitude, longitude];
+                    this.map.setView(newLatLng, 15);
+                    this.marker.setLatLng(newLatLng);
+                    this.showNotification('تم تحديد موقعك بنجاح', 'success');
+                }
+            },
+            (error) => {
+                this.showNotification('فشل في تحديد الموقع: ' + error.message, 'error');
+            }
+        );
+    }
+
+    selectPayment(method) {
+        this.selectedPayment = method;
+        this.showNotification(`تم اختيار ${method === 'cash' ? 'الدفع عند الاستلام' : 'الدفع الإلكتروني'}`, 'info');
+    }
+
+    submitOrder() {
+        const customerName = document.getElementById('customerName')?.value.trim();
+        const customerPhone = document.getElementById('customerPhone')?.value.trim();
+        
+        if (!customerName || !customerPhone) {
+            this.showNotification('الرجاء إدخال الاسم ورقم الهاتف', 'error');
+            return;
+        }
+        
+        if (customerPhone.length < 8) {
+            this.showNotification('رقم الهاتف غير صحيح', 'error');
+            return;
+        }
+        
+        if (!this.selectedPayment) {
+            this.showNotification('الرجاء اختيار طريقة الدفع', 'error');
+            return;
+        }
+        
+        // جمع بيانات الطلب
+        const orderData = {
+            customerName,
+            customerPhone,
+            customerLocation: this.marker ? this.marker.getLatLng() : { lat: 24.4539, lng: 54.3773 },
+            products: this.cart.map(item => ({
+                id: item.id,
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price
+            })),
+            subtotal: this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+            deliveryFee: this.settings.deliveryFee,
+            total: this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + this.settings.deliveryFee,
+            paymentMethod: this.selectedPayment,
+            status: 'new'
+        };
+        
+        // إضافة الطلب
+        const order = sharedStorage.addOrder(orderData);
+        
+        // إشعار النجاح
+        this.showSuccessMessage(order);
+        
+        // إعادة تعيين السلة
+        this.cart = [];
+        this.updateCartDisplay();
+        
+        // إغلاق النافذة بعد 3 ثوان
+        setTimeout(() => {
+            this.closeCurrentModal();
+        }, 3000);
+    }
+
+    showSuccessMessage(order) {
+        const modalContent = `
+            <div style="text-align: center; padding: 40px;">
+                <div style="font-size: 5rem; color: #2E8B57; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 style="color: #2E8B57; margin-bottom: 20px;">تم إرسال طلبك بنجاح!</h2>
+                <p style="color: #666; margin-bottom: 30px; line-height: 1.8;">
+                    شكراً لثقتك بنا. تم استلام طلبك رقم <strong>${order.orderNumber}</strong> وسنتواصل معك خلال ساعة لتأكيد الطلب وتحديد موعد التوصيل.
+                </p>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px; text-align: right;">
+                    <div style="margin-bottom: 10px;">
+                        <strong>اسم العميل:</strong> ${order.customerName}
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>رقم الهاتف:</strong> ${order.customerPhone}
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>المبلغ الإجمالي:</strong> ${order.total.toFixed(2)} ${this.settings.currency}
+                    </div>
+                    <div>
+                        <strong>طريقة الدفع:</strong> ${order.paymentMethod === 'cash' ? 'الدفع عند الاستلام' : 'الدفع الإلكتروني'}
+                    </div>
+                </div>
+                <button onclick="mainApp.closeCurrentModal()" 
+                        style="background: #4361EE; color: white; border: none; padding: 15px 40px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 1.1rem;">
+                    <i class="fas fa-home"></i> العودة للمتجر
+                </button>
+            </div>
+        `;
+        
+        this.showModal(modalContent, 'طلب ناجح');
+    }
+
+    showModal(content, title = '') {
+        // إنشاء نافذة منبثقة
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        `;
+        
+        const modalContainer = document.createElement('div');
+        modalContainer.className = 'modal-container';
+        modalContainer.style.cssText = `
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        `;
+        
+        let headerHTML = '';
+        if (title) {
+            headerHTML = `
+                <div style="padding: 25px 30px; border-bottom: 1px solid #eef2f7; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: #1A1A1A; font-size: 1.5rem; margin: 0;">${title}</h3>
+                    <button onclick="mainApp.closeCurrentModal()" style="background: none; border: none; font-size: 1.5rem; color: #999; cursor: pointer; padding: 5px;">&times;</button>
+                </div>
+            `;
+        }
+        
+        modalContainer.innerHTML = headerHTML + `
+            <div style="padding: ${title ? '30px' : '40px 30px'}">
+                ${content}
+            </div>
+        `;
+        
+        modal.appendChild(modalContainer);
+        document.body.appendChild(modal);
+        
+        // إضافة أنيميشن
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        `;
+        document.head.appendChild(style);
+        
+        this.currentModal = modal;
+    }
+
+    closeCurrentModal() {
+        if (this.currentModal) {
+            this.currentModal.remove();
+            this.currentModal = null;
+        }
+    }
+
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: ${type === 'success' ? '#2E8B57' : type === 'error' ? '#D32F2F' : type === 'warning' ? '#FF9800' : '#4361EE'};
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            z-index: 10000;
+            font-weight: 600;
+            animation: slideDown 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        `;
+        
+        const icon = {
+            'success': 'fa-check-circle',
+            'error': 'fa-times-circle',
+            'warning': 'fa-exclamation-triangle',
+            'info': 'fa-info-circle'
+        }[type];
+        
+        notification.innerHTML = `
+            <i class="fas ${icon}"></i>
+            ${message}
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // إضافة أنيميشن
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
+            @keyframes slideUp { from { top: 20px; opacity: 1; } to { top: -50px; opacity: 0; } }
+        `;
+        document.head.appendChild(style);
+        
+        // إزالة الإشعار بعد 3 ثوان
+        setTimeout(() => {
+            notification.style.animation = 'slideUp 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    loadMoreProducts() {
+        // في التطبيق الحقيقي، هذا سيجلب المزيد من المنتجات من الخادم
+        this.showNotification('جاري تحميل المزيد من المنتجات...', 'info');
+        
+        setTimeout(() => {
+            this.showNotification('تم تحميل المزيد من المنتجات', 'success');
+            // هنا ستضيف المنتجات الجديدة إلى this.products ثم تعيد renderProducts()
+        }, 1500);
+    }
+}
+
+// تهيئة التطبيق عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', () => {
+    window.mainApp = new MainApp();
+});
