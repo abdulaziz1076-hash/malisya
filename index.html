@@ -686,7 +686,9 @@
                             <div class="product-description">${product.description}</div>
                             <div class="product-footer">
                                 <div class="product-price">${product.price} ${settings.currency || 'درهم'}</div>
-                                <button class="btn btn-primary" onclick="appMain.addToCart(${product.id})" 
+                                <a href="product-details.html?id=${product.id}" class="btn btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-eye"></i> التفاصيل
+                                </a>
                                         ${!isAvailable ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
                                     <i class="fas ${!isAvailable ? 'fa-times' : 'fa-cart-plus'}"></i>
                                     ${!isAvailable ? 'غير متوفر' : 'إضافة'}
@@ -1007,4 +1009,5 @@
     </script>
 </body>
 </html>
+
 
