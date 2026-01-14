@@ -9,17 +9,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- خطوط عربية -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=El+Messiri:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=El+Messiri:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         /* الأساسيات */
         :root {
             --gold: #D4AF37;
+            --gold-light: #FFD700;
             --emerald: #2E8B57;
+            --emerald-light: #3CB371;
             --navy: #0A2647;
+            --navy-light: #1E3A5F;
             --light: #FFF9F0;
             --radius: 12px;
             --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 50px rgba(0,0,0,0.15);
+            --transition: all 0.3s ease;
         }
         
         * {
@@ -31,139 +36,335 @@
         body {
             font-family: 'Tajawal', sans-serif;
             color: #333;
-            background: #f9f9f9;
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0f4ff 100%);
             line-height: 1.6;
+            overflow-x: hidden;
         }
         
         .container {
-            max-width: 1300px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 20px;
         }
         
-        /* الهيدر */
+        /* الهيدر المحسن */
         header {
-            background: var(--navy);
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
             color: white;
             padding: 15px 0;
             position: sticky;
             top: 0;
-            z-index: 100;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
         }
         
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 20px;
         }
         
         .logo {
             display: flex;
             align-items: center;
             gap: 15px;
+            transition: var(--transition);
+        }
+        
+        .logo:hover {
+            transform: translateY(-2px);
         }
         
         .logo-icon {
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: var(--gold);
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
         .logo-text h1 {
             font-family: 'El Messiri', cursive;
-            font-size: 1.8rem;
+            font-size: 2rem;
+            background: linear-gradient(45deg, var(--gold), #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         .logo-text p {
             font-size: 0.9rem;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
         }
         
         .delivery-info {
             display: flex;
             align-items: center;
-            gap: 10px;
-            background: rgba(212, 175, 55, 0.1);
-            padding: 8px 15px;
-            border-radius: 20px;
+            gap: 12px;
+            background: rgba(212, 175, 55, 0.15);
+            padding: 12px 20px;
+            border-radius: 30px;
             border: 1px solid rgba(212, 175, 55, 0.3);
+            transition: var(--transition);
         }
         
-        /* الهيرو */
-        .hero {
-            background: linear-gradient(rgba(10, 38, 71, 0.9), rgba(10, 38, 71, 0.8)), 
-                        url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            padding: 100px 0;
-            text-align: center;
+        .delivery-info:hover {
+            background: rgba(212, 175, 55, 0.25);
+            transform: translateY(-2px);
         }
         
-        .hero h2 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            font-family: 'El Messiri', cursive;
-        }
-        
-        .hero p {
+        .delivery-info i {
+            color: var(--gold);
             font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto 30px;
-            opacity: 0.9;
         }
         
-        .hero span {
+        .contact-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.9);
+            transition: var(--transition);
+        }
+        
+        .contact-info:hover {
             color: var(--gold);
         }
         
-        /* المنتجات */
+        .admin-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--emerald);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+        
+        .admin-link:hover {
+            background: transparent;
+            border-color: var(--emerald);
+            color: var(--emerald);
+            transform: translateY(-2px);
+        }
+        
+        /* الهيرو المحسن */
+        .hero {
+            background: linear-gradient(rgba(10, 38, 71, 0.95), rgba(10, 38, 71, 0.9)), 
+                        url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            padding: 120px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+        }
+        
+        .hero h2 {
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+            font-family: 'El Messiri', cursive;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+        
+        .hero span {
+            background: linear-gradient(45deg, var(--gold), #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* إحصائيات سريعة */
+        .stats-section {
+            background: white;
+            padding: 40px 0;
+            box-shadow: var(--shadow);
+            margin-top: -40px;
+            position: relative;
+            z-index: 2;
+            border-radius: 0 0 var(--radius) var(--radius);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            transition: var(--transition);
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-10px);
+        }
+        
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--navy);
+            font-size: 1.8rem;
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        /* المنتجات - تصميم محسن */
         .products-section {
-            padding: 80px 0;
+            padding: 100px 0;
+            background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
         }
         
         .section-title {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 60px;
         }
         
         .section-title h2 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             color: var(--navy);
             margin-bottom: 15px;
             font-family: 'El Messiri', cursive;
+            position: relative;
+            display: inline-block;
         }
         
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold), var(--emerald));
+            border-radius: 2px;
+        }
+        
+        .section-title p {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* فلاتر التصنيفات المطابقة للإدارة */
         .filters {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 40px;
+            gap: 12px;
+            margin-bottom: 50px;
             flex-wrap: wrap;
+            padding: 20px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
         
         .filter-btn {
-            padding: 10px 20px;
+            padding: 12px 25px;
             background: white;
             border: 2px solid #e8e8e8;
-            border-radius: 25px;
+            border-radius: 30px;
             font-family: 'Tajawal', sans-serif;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
         
-        .filter-btn:hover, .filter-btn.active {
-            background: var(--gold);
-            color: var(--navy);
-            border-color: var(--gold);
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--gold), var(--emerald));
+            z-index: -1;
+            transform: translateY(100%);
+            transition: var(--transition);
         }
         
+        .filter-btn:hover {
+            color: white;
+            border-color: transparent;
+        }
+        
+        .filter-btn:hover::before {
+            transform: translateY(0);
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--gold), var(--emerald));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(46, 139, 87, 0.2);
+        }
+        
+        /* شبكة المنتجات المحسنة */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 50px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 35px;
+            margin-bottom: 60px;
         }
         
         .product-card {
@@ -171,24 +372,74 @@
             border-radius: var(--radius);
             overflow: hidden;
             box-shadow: var(--shadow);
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: var(--transition);
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.05);
         }
         
         .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            transform: translateY(-15px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .product-badges {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 2;
+        }
+        
+        .product-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            animation: badgePulse 2s infinite;
+        }
+        
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .badge-new {
+            background: linear-gradient(135deg, #2196F3, #21CBF3);
+        }
+        
+        .badge-sale {
+            background: linear-gradient(135deg, #FF416C, #FF4B2B);
+        }
+        
+        .badge-popular {
+            background: linear-gradient(135deg, #FF9800, #FF5722);
         }
         
         .product-image {
-            height: 200px;
+            height: 250px;
             overflow: hidden;
+            position: relative;
+        }
+        
+        .product-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.1));
         }
         
         .product-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.3s;
+            transition: transform 0.5s ease;
         }
         
         .product-card:hover .product-image img {
@@ -196,113 +447,191 @@
         }
         
         .product-content {
-            padding: 20px;
+            padding: 25px;
         }
         
-        .product-brand {
-            color: var(--emerald);
+        .product-category {
+            display: inline-block;
+            background: rgba(67, 97, 238, 0.1);
+            color: #4361EE;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
             font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 5px;
+            margin-bottom: 12px;
         }
         
         .product-name {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             margin-bottom: 10px;
             color: var(--navy);
+            line-height: 1.4;
+            height: 65px;
+            overflow: hidden;
         }
         
         .product-description {
             color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            height: 60px;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            height: 75px;
             overflow: hidden;
+        }
+        
+        .product-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .product-tag {
+            background: #f8f9fa;
+            color: #666;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            border: 1px solid #eef2f7;
         }
         
         .product-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eef2f7;
         }
         
         .product-price {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--navy);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
         
-        /* الأزرار */
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: var(--radius);
-            font-family: 'Tajawal', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
+        .current-price {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--emerald);
+        }
+        
+        .original-price {
+            font-size: 1rem;
+            color: #999;
+            text-decoration: line-through;
+        }
+        
+        .product-stock {
+            display: flex;
             align-items: center;
             gap: 8px;
-            text-decoration: none;
+            font-size: 0.9rem;
+            color: #666;
         }
         
-        .btn-primary {
-            background: linear-gradient(45deg, var(--gold), #FFD700);
+        .stock-badge {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .stock-high { background: #4CAF50; }
+        .stock-low { background: #FF9800; }
+        .stock-none { background: #f44336; }
+        
+        /* قسم المميزات */
+        .features-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 40px 30px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            color: var(--navy);
+            font-size: 2rem;
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.2);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
             color: var(--navy);
         }
         
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
-        }
-        
-        .btn-success {
-            background: var(--emerald);
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: #247c4c;
-        }
-        
-        .btn-block {
-            width: 100%;
-            justify-content: center;
-        }
-        
-        /* شريط الطلبات */
+        /* شريط الطلبات المحسن */
         .order-bar {
             position: fixed;
             bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
+            right: 50%;
+            transform: translateX(50%);
             background: white;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            padding: 15px 25px;
-            border-radius: 50px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+            padding: 20px 30px;
+            border-radius: 60px;
             display: none;
             align-items: center;
-            gap: 20px;
-            z-index: 99;
+            gap: 25px;
+            z-index: 1000;
             border: 2px solid var(--gold);
-            min-width: 400px;
+            min-width: 500px;
             max-width: 90%;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translate(50%, 100px);
+                opacity: 0;
+            }
+            to {
+                transform: translate(50%, 0);
+                opacity: 1;
+            }
         }
         
         .order-count {
-            background: var(--emerald);
+            background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
             color: white;
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(46, 139, 87, 0.3);
         }
         
         .order-info {
@@ -310,46 +639,151 @@
         }
         
         .order-total {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: 800;
             color: var(--navy);
         }
         
         .order-items {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #666;
         }
         
-        /* الفوتر */
-        footer {
-            background: var(--navy);
+        /* الأزرار المحسنة */
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 30px;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            z-index: -1;
+            transition: var(--transition);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: var(--navy);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(212, 175, 55, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
             color: white;
-            padding: 60px 0 30px;
-            margin-top: 80px;
+            box-shadow: 0 8px 25px rgba(46, 139, 87, 0.3);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(46, 139, 87, 0.4);
+        }
+        
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* الفوتر المحسن */
+        footer {
+            background: linear-gradient(135deg, var(--navy) 0%, #0a1f38 100%);
+            color: white;
+            padding: 80px 0 30px;
+            margin-top: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--gold), var(--emerald));
         }
         
         .footer-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 50px;
+            margin-bottom: 60px;
         }
         
         .footer-section h3 {
             color: var(--gold);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             font-family: 'El Messiri', cursive;
+            font-size: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 2px;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 15px;
+        }
+        
+        .footer-section ul li a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer-section ul li a:hover {
+            color: var(--gold);
+            transform: translateX(-5px);
         }
         
         .social-links {
             display: flex;
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 25px;
         }
         
         .social-link {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             background: rgba(255,255,255,0.1);
             display: flex;
@@ -357,97 +791,241 @@
             justify-content: center;
             color: white;
             text-decoration: none;
-            transition: all 0.3s;
+            transition: var(--transition);
+            font-size: 1.2rem;
         }
         
         .social-link:hover {
             background: var(--gold);
             color: var(--navy);
-            transform: translateY(-5px);
+            transform: translateY(-8px) rotate(5deg);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
         
         .footer-bottom {
             text-align: center;
-            padding-top: 30px;
+            padding-top: 40px;
             border-top: 1px solid rgba(255,255,255,0.1);
             color: rgba(255,255,255,0.6);
+            font-size: 0.95rem;
         }
         
-        /* نافذة الطلب */
+        .footer-bottom p {
+            margin-bottom: 10px;
+        }
+        
+        /* نافذة الطلب المحسنة */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 999;
+            z-index: 9999;
             padding: 20px;
+            backdrop-filter: blur(5px);
         }
         
         .modal-content {
             background: white;
             border-radius: var(--radius);
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             max-height: 90vh;
             overflow-y: auto;
-            animation: modalSlide 0.3s ease;
+            animation: modalSlide 0.4s ease-out;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            border: 1px solid rgba(212, 175, 55, 0.2);
         }
         
         @keyframes modalSlide {
-            from { opacity: 0; transform: translateY(-50px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { 
+                opacity: 0; 
+                transform: translateY(-50px) scale(0.9); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
         }
         
         .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid #eee;
+            padding: 25px;
+            border-bottom: 1px solid #eef2f7;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: linear-gradient(90deg, #f8f9fa, #ffffff);
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+        
+        .modal-header h3 {
+            color: var(--navy);
+            font-family: 'El Messiri', cursive;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: #999;
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .modal-close:hover {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+            transform: rotate(90deg);
         }
         
         .modal-body {
-            padding: 20px;
+            padding: 25px;
         }
         
         .modal-footer {
-            padding: 20px;
-            border-top: 1px solid #eee;
+            padding: 25px;
+            border-top: 1px solid #eef2f7;
+            background: #f8f9fa;
+            border-radius: 0 0 var(--radius) var(--radius);
         }
         
-        /* التجاوب */
+        /* حقل إدخال محسن */
+        .form-input {
+            padding: 15px;
+            border: 2px solid #eef2f7;
+            border-radius: var(--radius);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+            width: 100%;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+        
+        /* تحسينات للشاشات الصغيرة */
         @media (max-width: 768px) {
             .hero h2 {
-                font-size: 2.2rem;
+                font-size: 2.5rem;
             }
             
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-            
-            .order-bar {
-                flex-direction: column;
-                gap: 10px;
-                border-radius: var(--radius);
-                min-width: auto;
-                text-align: center;
+            .hero p {
+                font-size: 1.1rem;
+                padding: 0 20px;
             }
             
             .header-content {
                 flex-direction: column;
-                gap: 15px;
                 text-align: center;
+                gap: 15px;
+            }
+            
+            .header-info {
+                justify-content: center;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 25px;
+            }
+            
+            .order-bar {
+                flex-direction: column;
+                gap: 15px;
+                border-radius: var(--radius);
+                min-width: auto;
+                text-align: center;
+                padding: 20px;
+                right: 20px;
+                left: 20px;
+                transform: none;
+                width: calc(100% - 40px);
+            }
+            
+            .filters {
+                padding: 15px;
+                gap: 8px;
+            }
+            
+            .filter-btn {
+                padding: 10px 18px;
+                font-size: 0.9rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero {
+                padding: 80px 0;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-value {
+                font-size: 2rem;
+            }
+            
+            .feature-card {
+                padding: 30px 20px;
+            }
+        }
+        
+        /* أنيميشن للنص */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fadeInUp {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* تحسينات للشاشات الكبيرة */
+        @media (min-width: 1200px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+            
+            .hero h2 {
+                font-size: 4rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- الهيدر -->
+    <!-- الهيدر المحسن -->
     <header>
         <div class="container header-content">
             <div class="logo">
@@ -460,22 +1038,73 @@
                 </div>
             </div>
             
-            <div class="delivery-info">
-                <i class="fas fa-shipping-fast"></i>
-                <span>توصيل خلال 24 ساعة في الإمارات</span>
+            <div class="header-info">
+                <div class="delivery-info">
+                    <i class="fas fa-shipping-fast"></i>
+                    <span>توصيل خلال 24 ساعة في الإمارات</span>
+                </div>
+                
+                <div class="contact-info">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>+971 50 123 4567</span>
+                </div>
+                
+                <a href="admin.html" class="admin-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    لوحة التحكم
+                </a>
             </div>
         </div>
     </header>
 
-    <!-- الهيرو -->
+    <!-- الهيرو المحسن -->
     <section class="hero">
         <div class="container">
-            <h2>اكتشف سر <span>الصحة الماليزية</span></h2>
-            <p>نقدم لك نخبة منتجات DXN الصحية المستوردة مباشرة من ماليزيا. جودة عالمية، فعالية مثبتة، وتجربة تسوق استثنائية.</p>
-            <button class="btn btn-primary" id="viewProductsBtn">
+            <h2 class="animate-fadeInUp">اكتشف سر <span>الصحة الماليزية</span></h2>
+            <p class="animate-fadeInUp">نقدم لك نخبة منتجات DXN الصحية المستوردة مباشرة من ماليزيا. جودة عالمية، فعالية مثبتة، وتجربة تسوق استثنائية.</p>
+            <button class="btn btn-primary animate-fadeInUp" id="viewProductsBtn" style="animation-delay: 0.4s;">
                 <i class="fas fa-shopping-bag"></i>
                 تصفح المنتجات
             </button>
+        </div>
+    </section>
+
+    <!-- إحصائيات سريعة -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item animate-fadeInUp">
+                    <div class="stat-icon">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                    <div class="stat-value" id="productsCount">0</div>
+                    <div class="stat-label">منتج مميز</div>
+                </div>
+                
+                <div class="stat-item animate-fadeInUp" style="animation-delay: 0.1s;">
+                    <div class="stat-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">ساعة توصيل</div>
+                </div>
+                
+                <div class="stat-item animate-fadeInUp" style="animation-delay: 0.2s;">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">+500</div>
+                    <div class="stat-label">عميل سعيد</div>
+                </div>
+                
+                <div class="stat-item animate-fadeInUp" style="animation-delay: 0.3s;">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-value">4.9</div>
+                    <div class="stat-label">تقييم العملاء</div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -487,20 +1116,72 @@
                 <p>اكتشف منتجاتنا الصحية التي ستغير مفهومك للعناية بالصحة</p>
             </div>
             
+            <!-- فلاتر التصنيفات المطابقة للإدارة -->
             <div class="filters">
-                <button class="filter-btn active" data-filter="all">جميع المنتجات</button>
-                <button class="filter-btn" data-filter="popular">الأكثر مبيعاً</button>
-                <button class="filter-btn" data-filter="health">للصحة العامة</button>
+                <button class="filter-btn active" data-filter="all">كل المنتجات</button>
+                <button class="filter-btn" data-filter="health">منتجات صحية</button>
                 <button class="filter-btn" data-filter="coffee">قهوة ومشروبات</button>
+                <button class="filter-btn" data-filter="supplements">مكملات غذائية</button>
+                <button class="filter-btn" data-filter="honey">عسل</button>
+                <button class="filter-btn" data-filter="spices">بهارات وتوابل</button>
+                <button class="filter-btn" data-filter="new">منتجات جديدة</button>
             </div>
             
             <div class="products-grid" id="productsGrid">
                 <!-- المنتجات ستضاف هنا بالجافاسكريبت -->
+                <div class="loading-products" style="text-align: center; grid-column: 1 / -1; padding: 60px;">
+                    <div style="width: 50px; height: 50px; border: 3px solid #eef2f7; border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                    <p style="color: #666; font-size: 1.1rem;">جاري تحميل المنتجات...</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- شريط الطلبات -->
+    <!-- قسم المميزات -->
+    <section class="features-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>لماذا تختار ماليزيا الذهبية؟</h2>
+                <p>نقدم أفضل تجربة تسوق للمنتجات الصحية الماليزية</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card animate-fadeInUp">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>جودة مضمونة</h3>
+                    <p>جميع منتجاتنا أصلية من DXN ماليزيا مع شهادات الجودة</p>
+                </div>
+                
+                <div class="feature-card animate-fadeInUp" style="animation-delay: 0.1s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>توصيل سريع</h3>
+                    <p>نوصل طلباتك خلال 24 ساعة في جميع أنحاء الإمارات</p>
+                </div>
+                
+                <div class="feature-card animate-fadeInUp" style="animation-delay: 0.2s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>دعم فني 24/7</h3>
+                    <p>فريق دعم متاح على مدار الساعة للإجابة على استفساراتك</p>
+                </div>
+                
+                <div class="feature-card animate-fadeInUp" style="animation-delay: 0.3s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-hand-holding-heart"></i>
+                    </div>
+                    <h3>ضمان الاسترجاع</h3>
+                    <p>يمكنك استرجاع المنتج خلال 7 أيام إذا لم ترضيك الجودة</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- شريط الطلبات المحسن -->
     <div class="order-bar" id="orderBar">
         <div class="order-count" id="orderCount">0</div>
         <div class="order-info">
@@ -513,15 +1194,17 @@
         </button>
     </div>
 
-    <!-- الفوتر -->
+    <!-- الفوتر المحسن -->
     <footer>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>ماليزيا الذهبية</h3>
-                    <p>بوابتك إلى العالم الصحي الماليزي. جودة، ثقة، ورفاهية.</p>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px; line-height: 1.8;">
+                        بوابتك إلى العالم الصحي الماليزي. جودة، ثقة، ورفاهية.
+                    </p>
                     <div class="social-links">
-                        <a href="#" class="social-link">
+                        <a href="https://wa.me/971501234567" class="social-link" target="_blank">
                             <i class="fab fa-whatsapp"></i>
                         </a>
                         <a href="#" class="social-link">
@@ -530,39 +1213,73 @@
                         <a href="#" class="social-link">
                             <i class="fab fa-facebook"></i>
                         </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
                     </div>
                 </div>
                 
                 <div class="footer-section">
                     <h3>روابط سريعة</h3>
-                    <ul style="list-style: none;">
-                        <li style="margin-bottom: 10px;"><a href="#productsSection" style="color: rgba(255,255,255,0.8); text-decoration: none;">المنتجات</a></li>
-                        <li style="margin-bottom: 10px;"><a href="#" style="color: rgba(255,255,255,0.8); text-decoration: none;">عن الشركة</a></li>
-                        <li style="margin-bottom: 10px;"><a href="#" style="color: rgba(255,255,255,0.8); text-decoration: none;">الشروط والأحكام</a></li>
+                    <ul>
+                        <li><a href="#productsSection"><i class="fas fa-chevron-left"></i> المنتجات</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-left"></i> عن الشركة</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-left"></i> الشروط والأحكام</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-left"></i> سياسة الخصوصية</a></li>
+                        <li><a href="admin.html"><i class="fas fa-chevron-left"></i> لوحة التحكم</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-section">
                     <h3>معلومات التواصل</h3>
-                    <p><i class="fas fa-phone"></i> الواتساب: +971 50 123 4567</p>
-                    <p><i class="fas fa-envelope"></i> info@golden-malaysia.ae</p>
-                    <p><i class="fas fa-clock"></i> خدمة العملاء: 24/7</p>
+                    <ul>
+                        <li style="margin-bottom: 15px;">
+                            <a href="https://wa.me/971501234567" style="color: rgba(255,255,255,0.8);">
+                                <i class="fab fa-whatsapp"></i> الواتساب: +971 50 123 4567
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 15px;">
+                            <a href="mailto:info@golden-malaysia.ae" style="color: rgba(255,255,255,0.8);">
+                                <i class="fas fa-envelope"></i> info@golden-malaysia.ae
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 15px;">
+                            <i class="fas fa-clock"></i> خدمة العملاء: 24/7
+                        </li>
+                        <li style="margin-bottom: 15px;">
+                            <i class="fas fa-map-marker-alt"></i> الإمارات العربية المتحدة
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>الأقسام</h3>
+                    <ul>
+                        <li><a href="#" data-filter="health"><i class="fas fa-chevron-left"></i> منتجات صحية</a></li>
+                        <li><a href="#" data-filter="coffee"><i class="fas fa-chevron-left"></i> قهوة ومشروبات</a></li>
+                        <li><a href="#" data-filter="supplements"><i class="fas fa-chevron-left"></i> مكملات غذائية</a></li>
+                        <li><a href="#" data-filter="honey"><i class="fas fa-chevron-left"></i> عسل</a></li>
+                        <li><a href="#" data-filter="spices"><i class="fas fa-chevron-left"></i> بهارات وتوابل</a></li>
+                    </ul>
                 </div>
             </div>
             
             <div class="footer-bottom">
                 <p>© 2024 ماليزيا الذهبية. جميع الحقوق محفوظة.</p>
-                <p style="margin-top: 10px; font-size: 0.9rem;">DXN® هي علامة تجارية مسجلة لشركة DXN الدولية</p>
+                <p>DXN® هي علامة تجارية مسجلة لشركة DXN الدولية الماليزية</p>
+                <p style="margin-top: 15px; font-size: 0.85rem;">
+                    <i class="fas fa-globe"></i> malisya.onrender.com
+                </p>
             </div>
         </div>
     </footer>
 
-    <!-- نافذة إتمام الطلب -->
+    <!-- نافذة إتمام الطلب المحسنة -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3><i class="fas fa-shopping-cart"></i> إتمام الطلب</h3>
-                <button class="modal-close" onclick="closeOrderModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                <button class="modal-close" onclick="closeOrderModal()">&times;</button>
             </div>
             
             <div class="modal-body">
@@ -570,26 +1287,46 @@
                     <!-- عناصر الطلب ستضاف هنا -->
                 </div>
                 
-                <div id="orderSummary" style="background: #f8f9fa; padding: 15px; border-radius: var(--radius); margin: 20px 0;">
+                <div id="orderSummary" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 20px; border-radius: var(--radius); margin: 25px 0; border: 1px solid #eef2f7;">
                     <!-- ملخص الطلب -->
                 </div>
                 
                 <div>
-                    <h4 style="margin-bottom: 15px;">معلومات العميل</h4>
-                    <div style="display: grid; gap: 15px;">
-                        <input type="text" id="customerName" placeholder="الاسم الكامل *" 
-                               style="padding: 12px; border: 2px solid #eef2f7; border-radius: var(--radius); font-family: 'Tajawal', sans-serif;">
-                        <input type="tel" id="customerPhone" placeholder="رقم الهاتف *" 
-                               style="padding: 12px; border: 2px solid #eef2f7; border-radius: var(--radius); font-family: 'Tajawal', sans-serif;">
-                        <textarea id="customerAddress" placeholder="العنوان التفصيلي" 
-                                  style="padding: 12px; border: 2px solid #eef2f7; border-radius: var(--radius); min-height: 80px; font-family: 'Tajawal', sans-serif;"></textarea>
+                    <h4 style="margin-bottom: 20px; color: var(--navy); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-user-circle"></i>
+                        معلومات العميل
+                    </h4>
+                    <div style="display: grid; gap: 20px;">
+                        <input type="text" id="customerName" class="form-input" placeholder="الاسم الكامل *">
+                        <input type="tel" id="customerPhone" class="form-input" placeholder="رقم الهاتف *" dir="ltr">
+                        <textarea id="customerAddress" class="form-input" placeholder="العنوان التفصيلي (اختياري)" rows="3"></textarea>
+                        <select id="paymentMethod" class="form-input">
+                            <option value="cash">نقداً عند الاستلام</option>
+                            <option value="card">بطاقة ائتمان/خصم</option>
+                            <option value="bank">تحويل بنكي</option>
+                        </select>
                     </div>
+                </div>
+                
+                <div style="margin-top: 25px; padding: 15px; background: #fff8e1; border-right: 4px solid var(--gold); border-radius: var(--radius);">
+                    <h5 style="color: var(--navy); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-info-circle"></i>
+                        ملاحظة
+                    </h5>
+                    <p style="color: #666; font-size: 0.95rem;">
+                        سيتم تأكيد طلبك عبر الواتساب، وسنقوم بالاتصال بك خلال 30 دقيقة لتأكيد التفاصيل.
+                    </p>
                 </div>
             </div>
             
             <div class="modal-footer">
-                <button class="btn btn-success btn-block" onclick="submitOrder()">
-                    <i class="fas fa-check-circle"></i> تأكيد الطلب
+                <button class="btn" onclick="closeOrderModal()" style="background: #f8f9fa; color: #666; border: 2px solid #eef2f7;">
+                    <i class="fas fa-times"></i>
+                    إلغاء
+                </button>
+                <button class="btn btn-success" onclick="submitOrder()" id="submitOrderBtn">
+                    <i class="fas fa-check-circle"></i>
+                    تأكيد الطلب وإرسال الواتساب
                 </button>
             </div>
         </div>
@@ -597,91 +1334,143 @@
 
     <!-- JavaScript -->
     <script>
-        // بيانات المنتجات الافتراضية
+        // ========================================
+        // بيانات المنتجات المطابقة للإدارة
+        // ========================================
         const defaultProducts = [
             {
                 id: 1,
-                name: "قهوة الجانوديرما",
+                name: "قهوة الجانوديرما الفاخرة",
                 brand: "DXN",
-                description: "قهوة صحية مع خلاصة فطر الجانوديرما لتقوية المناعة والطاقة",
-                price: 85,
+                description: "خلطة فريدة من فطر الجانوديرما النادر مع أجود أنواع البن الماليزي. تعزز الطاقة والمناعة بطريقة طبيعية.",
+                price: 95,
+                originalPrice: 120,
                 image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                category: ["coffee", "popular", "health"],
+                category: ["health", "coffee"],
+                tags: ["جانوديرما", "قهوة", "طاقة", "مناعة"],
                 available: true,
-                stock: 50
+                stock: 50,
+                rating: 4.8,
+                reviews: 42,
+                isNew: false,
+                onSale: true,
+                featured: true
             },
             {
                 id: 2,
-                name: "كبسولات الجانوديرما",
+                name: "كبسولات الجانوديرما النقية",
                 brand: "DXN",
-                description: "كبسولات فطر الجانوديرما النقية لدعم الصحة العامة والمناعة",
-                price: 120,
-                image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?ixlib=rb-4.0.3&auto=format&fit=crop&w-800&q=80",
-                category: ["health", "popular"],
+                description: "مكمل غذائي من فطر الجانوديرما النقي 100%، 60 كبسولة. لدعم الصحة العامة وتعزيز المناعة.",
+                price: 180,
+                image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: ["health", "supplements"],
+                tags: ["مكملات", "جانوديرما", "صحة", "مناعة"],
                 available: true,
-                stock: 30
+                stock: 30,
+                rating: 4.9,
+                reviews: 56,
+                isNew: true,
+                onSale: false,
+                featured: true
             },
             {
                 id: 3,
-                name: "شاي سبيرولينا",
-                brand: "DXN",
-                description: "شاي عضوي مع سبيرولينا لإزالة السموم وتنقية الجسم",
-                price: 75,
-                image: "https://images.unsplash.com/photo-1561047029-3000c68339ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                category: ["health", "coffee"],
+                name: "عسل المانوكا النيوزيلندي",
+                brand: "Malaysian Premium",
+                description: "عسل مانوكا الأصلي بخصائص مضادة للبكتيريا، مثالي للصحة العامة وتعزيز المناعة.",
+                price: 150,
+                image: "https://images.unsplash.com/photo-1587049352851-8d4e89133924?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: ["health", "honey"],
+                tags: ["عسل", "مانوكا", "صحة", "طبيعي"],
                 available: true,
-                stock: 40
+                stock: 25,
+                rating: 4.7,
+                reviews: 38,
+                isNew: false,
+                onSale: false,
+                featured: true
             },
             {
                 id: 4,
-                name: "عسل المانوكا",
-                brand: "DXN",
-                description: "عسل مانوكا النيوزيلندي الأصلي لخصائصه المضادة للبكتيريا",
-                price: 150,
-                image: "https://images.unsplash.com/photo-1587049352851-8d4e89133924?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                category: ["health", "popular"],
+                name: "شاي هالا مالاوي الأصلي",
+                brand: "Golden Malaysia",
+                description: "شاي مالاوي أصلي من أفضل المزارع، نكهة غنية ورائحة فواحة. مثالي لمحبي الشاي الأصيل.",
+                price: 65,
+                image: "https://images.unsplash.com/photo-1561047029-3000c68339ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: ["coffee"],
+                tags: ["شاي", "مالاوي", "طبيعي", "مشروبات"],
                 available: true,
-                stock: 25
+                stock: 100,
+                rating: 4.5,
+                reviews: 29,
+                isNew: false,
+                onSale: true,
+                featured: false
             },
             {
                 id: 5,
-                name: "مكمل RC",
+                name: "قهوة لينزي الماليزية",
                 brand: "DXN",
-                description: "مكمل ريحي كوريديس للجهاز التنفسي وصحة الرئتين",
-                price: 95,
-                image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                category: ["health"],
+                description: "قهوة لينزي المميزة بمزيج من الأعشاب الطبيعية لتعزيز الطاقة والحيوية.",
+                price: 80,
+                image: "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: ["coffee"],
+                tags: ["قهوة", "لينزي", "طاقة", "مشروبات"],
                 available: true,
-                stock: 35
+                stock: 45,
+                rating: 4.6,
+                reviews: 34,
+                isNew: true,
+                onSale: false,
+                featured: false
             },
             {
                 id: 6,
-                name: "قهوة لينزي",
-                brand: "DXN",
-                description: "قهوة لينزي المميزة بمزيج من الأعشاب الطبيعية للطاقة",
-                price: 80,
-                image: "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                category: ["coffee", "popular"],
+                name: "مجموعة بهارات ماليزية",
+                brand: "Golden Malaysia",
+                description: "مجموعة فاخرة من البهارات الماليزية الأصلية المستوردة مباشرة من المزارع.",
+                price: 120,
+                image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                category: ["spices"],
+                tags: ["بهارات", "توابل", "ماليزيا", "طبخ"],
                 available: true,
-                stock: 45
+                stock: 60,
+                rating: 4.8,
+                reviews: 47,
+                isNew: true,
+                onSale: true,
+                featured: true
             }
         ];
 
+        // ========================================
         // إعدادات الموقع
+        // ========================================
         const defaultSettings = {
-            currency: "درهم",
+            currency: "درهم إماراتي",
+            currencySymbol: "د.إ",
             deliveryFee: 30,
-            whatsappNumber: "+966553166315",
-            storeName: "ماليزيا الذهبية"
+            whatsappNumber: "+971501234567",
+            storeName: "ماليزيا الذهبية",
+            storeEmail: "info@golden-malaysia.ae"
         };
 
+        // ========================================
         // SimpleStorage الكائن البديل
+        // ========================================
         window.simpleStorage = {
             getProducts: function() {
                 try {
                     const saved = localStorage.getItem('goldenMalaysia_products');
-                    return saved ? JSON.parse(saved) : defaultProducts;
-                } catch {
+                    if (saved) {
+                        return JSON.parse(saved);
+                    } else {
+                        // حفظ المنتجات الافتراضية
+                        this.saveProducts(defaultProducts);
+                        return defaultProducts;
+                    }
+                } catch (error) {
+                    console.error('Error loading products:', error);
                     return defaultProducts;
                 }
             },
@@ -691,33 +1480,42 @@
                 return products.find(p => p.id == id);
             },
             
+            saveProducts: function(products) {
+                try {
+                    localStorage.setItem('goldenMalaysia_products', JSON.stringify(products));
+                    return true;
+                } catch (error) {
+                    console.error('Error saving products:', error);
+                    return false;
+                }
+            },
+            
             getSettings: function() {
                 try {
                     const saved = localStorage.getItem('goldenMalaysia_settings');
                     return saved ? JSON.parse(saved) : defaultSettings;
-                } catch {
+                } catch (error) {
+                    console.error('Error loading settings:', error);
                     return defaultSettings;
                 }
             },
             
             addOrder: function(orderData) {
                 try {
-                    // إنشاء رقم طلب
-                    const orderNumber = 'ORD-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-                    const order = {
-                        ...orderData,
-                        orderNumber: orderNumber,
-                        date: new Date().toISOString(),
-                        id: Date.now()
-                    };
-                    
                     // الحصول على الطلبات الحالية
                     const orders = this.getOrders();
+                    const newId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1001;
+                    const orderNumber = `ORD-${new Date().getFullYear()}${String(newId).padStart(4, '0')}`;
+                    
+                    const order = {
+                        id: newId,
+                        orderNumber,
+                        createdAt: new Date().toISOString(),
+                        ...orderData
+                    };
+                    
                     orders.push(order);
-                    
-                    // حفظ الطلبات
                     localStorage.setItem('goldenMalaysia_orders', JSON.stringify(orders));
-                    
                     return order;
                 } catch (error) {
                     console.error('Error saving order:', error);
@@ -729,24 +1527,40 @@
                 try {
                     const saved = localStorage.getItem('goldenMalaysia_orders');
                     return saved ? JSON.parse(saved) : [];
-                } catch {
+                } catch (error) {
+                    console.error('Error loading orders:', error);
                     return [];
                 }
             }
         };
-        
+
+        // ========================================
+        // الفئة الرئيسية للتطبيق
+        // ========================================
         class MainApp {
             constructor() {
                 this.cart = [];
+                this.products = [];
+                this.settings = {};
+                this.currentFilter = 'all';
                 this.init();
             }
 
             init() {
                 console.log("🚀 بدء تطبيق ماليزيا الذهبية...");
+                this.loadData();
                 this.loadCart();
-                this.renderProducts();
                 this.setupEventListeners();
+                this.renderProducts();
                 this.updateOrderBar();
+                this.updateProductsCount();
+                this.animateElements();
+            }
+
+            loadData() {
+                this.products = simpleStorage.getProducts();
+                this.settings = simpleStorage.getSettings();
+                console.log(`📊 تم تحميل ${this.products.length} منتج`);
             }
 
             loadCart() {
@@ -790,7 +1604,30 @@
                         
                         // تطبيق الفلتر
                         const filter = e.target.dataset.filter;
+                        this.currentFilter = filter;
                         this.filterProducts(filter);
+                    });
+                });
+
+                // روابط الفلتر في الفوتر
+                document.querySelectorAll('.footer-section a[data-filter]').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const filter = link.dataset.filter;
+                        this.currentFilter = filter;
+                        
+                        // تحديث أزرار الفلتر
+                        document.querySelectorAll('.filter-btn').forEach(b => {
+                            b.classList.remove('active');
+                            if (b.dataset.filter === filter) {
+                                b.classList.add('active');
+                            }
+                        });
+                        
+                        this.filterProducts(filter);
+                        document.getElementById('productsSection').scrollIntoView({ 
+                            behavior: 'smooth' 
+                        });
                     });
                 });
 
@@ -801,6 +1638,16 @@
                         this.openOrderModal();
                     });
                 }
+
+                // زر إغلاق المودال
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.closeOrderModal();
+                    }
+                });
+
+                // تحميل المزيد من المنتجات عند التمرير
+                window.addEventListener('scroll', this.handleScroll.bind(this));
             }
 
             renderProducts() {
@@ -809,37 +1656,109 @@
 
                 container.innerHTML = '';
                 
-                const products = simpleStorage.getProducts();
-                const settings = simpleStorage.getSettings();
+                let filteredProducts = this.products;
                 
-                products.forEach(product => {
+                // تطبيق الفلتر الحالي
+                if (this.currentFilter !== 'all') {
+                    if (this.currentFilter === 'new') {
+                        filteredProducts = this.products.filter(p => p.isNew);
+                    } else {
+                        filteredProducts = this.products.filter(p => 
+                            Array.isArray(p.category) && p.category.includes(this.currentFilter)
+                        );
+                    }
+                }
+                
+                // تحديث عدد المنتجات
+                this.updateProductsCount(filteredProducts.length);
+                
+                if (filteredProducts.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-products" style="text-align: center; grid-column: 1 / -1; padding: 60px;">
+                            <i class="fas fa-box-open" style="font-size: 4rem; color: #dee2e6; margin-bottom: 20px;"></i>
+                            <h3 style="color: #666; margin-bottom: 15px;">لا توجد منتجات في هذا القسم</h3>
+                            <p style="color: #999;">جرّب اختيار قسم آخر من الفلاتر أعلاه</p>
+                            <button class="btn btn-primary" onclick="appMain.filterProducts('all')" style="margin-top: 20px;">
+                                عرض كل المنتجات
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // عرض المنتجات
+                filteredProducts.forEach((product, index) => {
                     const isAvailable = product.available && product.stock > 0;
+                    const stockStatus = product.stock > 10 ? 'high' : (product.stock > 0 ? 'low' : 'none');
+                    const stockText = product.stock > 10 ? 'متوفر' : (product.stock > 0 ? 'كمية محدودة' : 'غير متوفر');
                     
                     const card = document.createElement('div');
                     card.className = 'product-card';
                     card.dataset.category = Array.isArray(product.category) ? product.category.join(' ') : product.category;
+                    card.style.animationDelay = `${index * 0.1}s`;
+                    card.classList.add('animate-fadeInUp');
+                    
+                    let badges = '';
+                    if (product.isNew) {
+                        badges += `<span class="product-badge badge-new">جديد</span>`;
+                    }
+                    if (product.onSale) {
+                        badges += `<span class="product-badge badge-sale">عرض خاص</span>`;
+                    }
+                    if (product.featured) {
+                        badges += `<span class="product-badge badge-popular">مميز</span>`;
+                    }
                     
                     card.innerHTML = `
+                        <div class="product-badges">
+                            ${badges}
+                        </div>
                         <div class="product-image">
-                            <img src="${product.image}" alt="${product.name}">
+                            <img src="${product.image}" alt="${product.name}" 
+                                 onerror="this.src='https://images.unsplash.com/photo-1559056199-641a0ac8b55e?ixlib=rb-4.0.3&w=500&q=80'">
                         </div>
                         <div class="product-content">
-                            <div class="product-brand">${product.brand}</div>
+                            <div class="product-category">
+                                ${Array.isArray(product.category) ? product.category[0] : product.category}
+                            </div>
                             <div class="product-name">${product.name}</div>
                             <div class="product-description">${product.description}</div>
+                            
+                            <div class="product-tags">
+                                ${product.tags && Array.isArray(product.tags) ? 
+                                    product.tags.slice(0, 3).map(tag => 
+                                        `<span class="product-tag">${tag}</span>`
+                                    ).join('') : ''}
+                            </div>
+                            
                             <div class="product-footer">
-                                <div class="product-price">${product.price} ${settings.currency || 'درهم'}</div>
-                                <div style="display: flex; gap: 10px;">
-                                    <a href="product-details.html?id=${product.id}" class="btn btn-primary">
-                                        <i class="fas fa-eye"></i> التفاصيل
-                                    </a>
-                                    <button class="btn btn-success" 
-                                            onclick="appMain.addToCart(${product.id})"
-                                            ${!isAvailable ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
-                                        <i class="fas ${!isAvailable ? 'fa-times' : 'fa-cart-plus'}"></i>
-                                        ${!isAvailable ? 'غير متوفر' : 'إضافة'}
-                                    </button>
+                                <div class="product-price">
+                                    <div class="current-price">
+                                        ${product.price} ${this.settings.currencySymbol || 'د.إ'}
+                                        ${product.originalPrice ? 
+                                            `<div class="original-price">${product.originalPrice} ${this.settings.currencySymbol || 'د.إ'}</div>` : ''}
+                                    </div>
                                 </div>
+                                
+                                <div class="product-stock">
+                                    <span class="stock-badge stock-${stockStatus}"></span>
+                                    <span>${stockText}</span>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <a href="#" class="btn" onclick="appMain.viewProductDetails(${product.id})" 
+                                   style="flex: 1; background: #f8f9fa; color: #666; border: 2px solid #eef2f7;">
+                                    <i class="fas fa-eye"></i>
+                                    التفاصيل
+                                </a>
+                                <button class="btn btn-success" 
+                                        onclick="appMain.addToCart(${product.id})"
+                                        style="flex: 2"
+                                        ${!isAvailable ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                                    <i class="fas ${!isAvailable ? 'fa-times' : 'fa-cart-plus'}"></i>
+                                    ${!isAvailable ? 'غير متوفر' : 'أضف إلى العربة'}
+                                </button>
                             </div>
                         </div>
                     `;
@@ -849,17 +1768,17 @@
             }
 
             filterProducts(filter) {
-                const products = document.querySelectorAll('.product-card');
+                this.currentFilter = filter;
+                this.renderProducts();
                 
-                products.forEach(product => {
-                    if (filter === 'all') {
-                        product.style.display = 'block';
-                    } else if (filter === 'popular') {
-                        product.style.display = product.dataset.category.includes('popular') ? 'block' : 'none';
-                    } else {
-                        product.style.display = product.dataset.category.includes(filter) ? 'block' : 'none';
-                    }
-                });
+                // إضافة تأثير للنقر على الفلتر
+                const activeBtn = document.querySelector(`.filter-btn[data-filter="${filter}"]`);
+                if (activeBtn) {
+                    activeBtn.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        activeBtn.style.transform = 'scale(1)';
+                    }, 200);
+                }
             }
 
             addToCart(productId) {
@@ -878,7 +1797,7 @@
                 const existingItem = this.cart.find(item => item.id === productId);
                 if (existingItem) {
                     if (existingItem.quantity >= product.stock) {
-                        this.showAlert('لا يمكن إضافة المزيد، الكمية المتاحة: ' + product.stock, 'warning');
+                        this.showAlert(`لا يمكن إضافة المزيد، الكمية المتاحة فقط ${product.stock} وحدة`, 'warning');
                         return;
                     }
                     existingItem.quantity += 1;
@@ -889,22 +1808,40 @@
                         price: product.price,
                         image: product.image,
                         quantity: 1,
-                        stock: product.stock
+                        stock: product.stock,
+                        brand: product.brand
                     });
                 }
 
                 this.saveCart();
                 this.updateOrderBar();
-                this.showAlert(`تم إضافة ${product.name} إلى العربة`, 'success');
+                
+                // تأثير إضافة المنتج
+                this.showAlert(`تم إضافة "${product.name}" إلى العربة`, 'success');
+                
+                // اهتزاز زر العربة
+                const addBtn = event.target.closest('.btn-success');
+                if (addBtn) {
+                    addBtn.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        addBtn.style.transform = 'scale(1)';
+                    }, 300);
+                }
             }
 
             removeFromCart(productId) {
                 const index = this.cart.findIndex(item => item.id === productId);
                 if (index !== -1) {
+                    const removedProduct = this.cart[index];
                     this.cart.splice(index, 1);
                     this.saveCart();
                     this.updateOrderBar();
-                    this.showAlert('تم إزالة المنتج من العربة', 'info');
+                    this.showAlert(`تم إزالة "${removedProduct.name}" من العربة`, 'info');
+                    
+                    // إذا كانت النافذة مفتوحة، قم بتحديثها
+                    if (document.getElementById('orderModal').style.display === 'flex') {
+                        this.refreshOrderModal();
+                    }
                 }
             }
 
@@ -916,15 +1853,24 @@
                 const orderCount = document.getElementById('orderCount');
                 const orderTotal = document.getElementById('orderTotal');
                 const orderItems = document.getElementById('orderItems');
-                const settings = simpleStorage.getSettings();
                 
                 if (orderBar) {
                     if (totalItems > 0) {
                         orderBar.style.display = 'flex';
-                        if (orderCount) orderCount.textContent = totalItems;
-                        if (orderTotal) orderTotal.textContent = `${totalAmount.toFixed(2)} ${settings.currency || 'درهم'}`;
+                        if (orderCount) {
+                            orderCount.textContent = totalItems;
+                            // تأثير للتغيير
+                            orderCount.style.transform = 'scale(1.2)';
+                            setTimeout(() => {
+                                orderCount.style.transform = 'scale(1)';
+                            }, 300);
+                        }
+                        if (orderTotal) {
+                            orderTotal.textContent = `${totalAmount.toFixed(2)} ${this.settings.currencySymbol || 'د.إ'}`;
+                        }
                         if (orderItems) {
-                            orderItems.textContent = totalItems === 1 ? 'منتج واحد' : `${totalItems} منتجات`;
+                            const productCount = this.cart.length;
+                            orderItems.textContent = productCount === 1 ? 'منتج واحد' : `${productCount} منتجات`;
                         }
                     } else {
                         orderBar.style.display = 'none';
@@ -932,33 +1878,64 @@
                 }
             }
 
+            updateProductsCount(count = null) {
+                const productsCount = count || this.products.length;
+                const countElement = document.getElementById('productsCount');
+                if (countElement) {
+                    countElement.textContent = productsCount;
+                }
+            }
+
             openOrderModal() {
                 if (this.cart.length === 0) {
-                    this.showAlert('عربة التسوق فارغة', 'warning');
+                    this.showAlert('عربة التسوق فارغة، أضف بعض المنتجات أولاً', 'warning');
                     return;
                 }
 
                 const modal = document.getElementById('orderModal');
                 const itemsList = document.getElementById('orderItemsList');
                 const orderSummary = document.getElementById('orderSummary');
-                const settings = simpleStorage.getSettings();
                 
                 if (!modal || !itemsList || !orderSummary) return;
                 
                 // عرض عناصر الطلب
                 let itemsHTML = '';
-                this.cart.forEach((item) => {
+                this.cart.forEach((item, index) => {
+                    const itemTotal = item.price * item.quantity;
                     itemsHTML += `
-                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f8f9fa; border-radius: var(--radius); margin-bottom: 10px;">
-                            <img src="${item.image}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">
-                            <div style="flex: 1;">
-                                <div style="font-weight: 700; color: var(--navy);">${item.name}</div>
-                                <div style="color: #666; font-size: 0.9rem;">${item.price} ${settings.currency} × ${item.quantity}</div>
+                        <div class="cart-item" style="display: flex; align-items: center; gap: 15px; padding: 20px; background: #f8f9fa; border-radius: var(--radius); margin-bottom: 15px; transition: all 0.3s;"
+                             onmouseenter="this.style.background='#f0f4ff'"
+                             onmouseleave="this.style.background='#f8f9fa'">
+                            <div style="position: relative;">
+                                <img src="${item.image}" style="width: 70px; height: 70px; border-radius: 10px; object-fit: cover; border: 2px solid white;">
+                                <span style="position: absolute; top: -8px; left: -8px; background: var(--emerald); color: white; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;">
+                                    ${index + 1}
+                                </span>
                             </div>
-                            <div style="font-weight: 700; color: var(--emerald);">${(item.price * item.quantity).toFixed(2)} ${settings.currency}</div>
-                            <button onclick="appMain.removeFromCart(${item.id}); appMain.refreshOrderModal();" 
-                                    style="background: #f44336; color: white; border: none; width: 30px; height: 30px; border-radius: 5px; cursor: pointer;">
-                                <i class="fas fa-times"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; color: var(--navy); margin-bottom: 5px;">${item.name}</div>
+                                <div style="color: #666; font-size: 0.9rem; margin-bottom: 8px;">${item.brand}</div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="display: flex; align-items: center; gap: 10px; background: white; padding: 5px 15px; border-radius: 20px; border: 1px solid #eef2f7;">
+                                        <button onclick="appMain.updateCartQuantity(${item.id}, -1)" 
+                                                style="width: 25px; height: 25px; border-radius: 50%; background: #f8f9fa; border: 1px solid #dee2e6; color: #666; cursor: pointer; font-weight: bold;">-</button>
+                                        <span style="font-weight: 700; min-width: 30px; text-align: center;">${item.quantity}</span>
+                                        <button onclick="appMain.updateCartQuantity(${item.id}, 1)" 
+                                                style="width: 25px; height: 25px; border-radius: 50%; background: #f8f9fa; border: 1px solid #dee2e6; color: #666; cursor: pointer; font-weight: bold;">+</button>
+                                    </div>
+                                    <div style="font-weight: 700; color: var(--emerald);">
+                                        ${item.price} ${this.settings.currencySymbol} × ${item.quantity}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="font-weight: 800; color: var(--navy); font-size: 1.2rem;">
+                                ${itemTotal.toFixed(2)} ${this.settings.currencySymbol}
+                            </div>
+                            <button onclick="appMain.removeFromCart(${item.id})" 
+                                    style="width: 35px; height: 35px; border-radius: 50%; background: rgba(244, 67, 54, 0.1); border: 2px solid rgba(244, 67, 54, 0.2); color: #f44336; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s;"
+                                    onmouseenter="this.style.background='#f44336'; this.style.color='white'"
+                                    onmouseleave="this.style.background='rgba(244, 67, 54, 0.1)'; this.style.color='#f44336'">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     `;
@@ -968,21 +1945,21 @@
                 
                 // عرض ملخص الطلب
                 const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                const deliveryFee = settings.deliveryFee || 30;
+                const deliveryFee = this.settings.deliveryFee || 30;
                 const total = subtotal + deliveryFee;
                 
                 orderSummary.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>المجموع الفرعي:</span>
-                        <span><strong>${subtotal.toFixed(2)} ${settings.currency}</strong></span>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #dee2e6;">
+                        <span style="color: #666;">المجموع الفرعي:</span>
+                        <span style="font-weight: 700;">${subtotal.toFixed(2)} ${this.settings.currencySymbol}</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>رسوم التوصيل:</span>
-                        <span><strong>${deliveryFee} ${settings.currency}</strong></span>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #dee2e6;">
+                        <span style="color: #666;">رسوم التوصيل:</span>
+                        <span style="font-weight: 700;">${deliveryFee} ${this.settings.currencySymbol}</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; padding-top: 10px; border-top: 2px solid #dee2e6;">
-                        <span>المجموع الإجمالي:</span>
-                        <span style="color: var(--emerald);">${total.toFixed(2)} ${settings.currency}</span>
+                    <div style="display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: 800; padding-top: 15px;">
+                        <span style="color: var(--navy);">المجموع الإجمالي:</span>
+                        <span style="color: var(--emerald);">${total.toFixed(2)} ${this.settings.currencySymbol}</span>
                     </div>
                 `;
                 
@@ -990,21 +1967,57 @@
                 document.getElementById('customerName').value = '';
                 document.getElementById('customerPhone').value = '';
                 document.getElementById('customerAddress').value = '';
+                document.getElementById('paymentMethod').value = 'cash';
                 
                 modal.style.display = 'flex';
+                
+                // إضافة تأثير للمودال
+                modal.style.opacity = '0';
+                setTimeout(() => {
+                    modal.style.opacity = '1';
+                }, 10);
+            }
+
+            updateCartQuantity(productId, delta) {
+                const item = this.cart.find(item => item.id === productId);
+                if (!item) return;
+                
+                const product = simpleStorage.getProduct(productId);
+                if (!product) return;
+                
+                let newQuantity = item.quantity + delta;
+                
+                // التحقق من الحدود
+                if (newQuantity < 1) {
+                    this.removeFromCart(productId);
+                    return;
+                }
+                
+                if (newQuantity > product.stock) {
+                    this.showAlert(`الكمية المتاحة فقط ${product.stock} وحدة`, 'warning');
+                    newQuantity = product.stock;
+                }
+                
+                item.quantity = newQuantity;
+                this.saveCart();
+                this.updateOrderBar();
+                this.refreshOrderModal();
             }
 
             refreshOrderModal() {
                 this.closeOrderModal();
                 setTimeout(() => {
                     this.openOrderModal();
-                }, 100);
+                }, 150);
             }
 
             closeOrderModal() {
                 const modal = document.getElementById('orderModal');
                 if (modal) {
-                    modal.style.display = 'none';
+                    modal.style.opacity = '0';
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                    }, 300);
                 }
             }
 
@@ -1012,24 +2025,35 @@
                 const name = document.getElementById('customerName').value.trim();
                 const phone = document.getElementById('customerPhone').value.trim();
                 const address = document.getElementById('customerAddress').value.trim() || '';
+                const paymentMethod = document.getElementById('paymentMethod').value;
 
-                if (!name || !phone) {
-                    this.showAlert('يرجى إدخال الاسم ورقم الهاتف', 'error');
+                // التحقق من البيانات
+                if (!name) {
+                    this.showAlert('يرجى إدخال الاسم الكامل', 'error');
+                    document.getElementById('customerName').focus();
                     return;
                 }
 
-                if (!/^[\d\s\+\-\(\)]+$/.test(phone)) {
+                if (!phone) {
+                    this.showAlert('يرجى إدخال رقم الهاتف', 'error');
+                    document.getElementById('customerPhone').focus();
+                    return;
+                }
+
+                // تنظيف رقم الهاتف
+                const cleanPhone = phone.replace(/\s+/g, '').replace(/[^\d+]/g, '');
+                if (cleanPhone.length < 9) {
                     this.showAlert('يرجى إدخال رقم هاتف صحيح', 'error');
                     return;
                 }
 
-                const settings = simpleStorage.getSettings();
                 const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                const deliveryFee = settings.deliveryFee || 30;
+                const deliveryFee = this.settings.deliveryFee || 30;
 
                 const orderData = {
                     customerName: name,
-                    customerPhone: phone,
+                    customerPhone: cleanPhone,
+                    customerEmail: '',
                     address: address,
                     items: this.cart.map(item => ({
                         productId: item.id,
@@ -1041,76 +2065,210 @@
                     subtotal: subtotal,
                     deliveryFee: deliveryFee,
                     total: subtotal + deliveryFee,
-                    paymentMethod: 'cash',
+                    paymentMethod: paymentMethod,
                     status: 'new',
-                    date: new Date().toISOString()
+                    orderDate: new Date().toISOString(),
+                    notes: ''
                 };
 
-                // حفظ الطلب
-                const order = simpleStorage.addOrder(orderData);
-                
-                if (order) {
-                    // إرسال رسالة واتساب
-                    this.sendWhatsAppOrder(order);
+                // عرض تحميل
+                const submitBtn = document.getElementById('submitOrderBtn');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<div class="loading" style="border-color: #fff #fff #fff #ffffff; width: 20px; height: 20px;"></div> جاري إنشاء الطلب...';
+                submitBtn.disabled = true;
+
+                setTimeout(() => {
+                    // حفظ الطلب
+                    const order = simpleStorage.addOrder(orderData);
                     
-                    // تفريغ العربة
-                    this.cart = [];
-                    this.saveCart();
-                    this.updateOrderBar();
-                    
-                    // إغلاق النافذة
-                    this.closeOrderModal();
-                    
-                    this.showAlert('تم إرسال طلبك بنجاح! سنتصل بك قريباً', 'success');
-                } else {
-                    this.showAlert('حدث خطأ في إرسال الطلب', 'error');
-                }
+                    if (order) {
+                        // إرسال رسالة واتساب
+                        this.sendWhatsAppOrder(order);
+                        
+                        // تفريغ العربة
+                        this.cart = [];
+                        this.saveCart();
+                        this.updateOrderBar();
+                        
+                        // إغلاق النافذة
+                        this.closeOrderModal();
+                        
+                        // رسالة نجاح
+                        this.showAlert(`تم إرسال طلبك بنجاح! رقم الطلب: ${order.orderNumber}`, 'success');
+                        
+                        // إعادة تعيين الزر
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    } else {
+                        this.showAlert('حدث خطأ في إرسال الطلب، يرجى المحاولة مرة أخرى', 'error');
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
+                }, 1500);
             }
 
             sendWhatsAppOrder(order) {
-                const whatsappNumber = simpleStorage.getSettings().whatsappNumber || '+966553166315';
-                const settings = simpleStorage.getSettings();
+                const whatsappNumber = this.settings.whatsappNumber || '+971501234567';
                 
-                const message = `📦 طلب جديد من موقع ماليزيا الذهبية\n\n` +
-                               `👤 الاسم: ${order.customerName}\n` +
-                               `📱 الهاتف: ${order.customerPhone}\n` +
-                               `📍 العنوان: ${order.address || 'لم يتم تحديد العنوان'}\n` +
-                               `💵 طريقة الدفع: نقداً عند الاستلام\n\n` +
-                               `🛒 المنتجات:\n${order.items.map(item => `- ${item.productName} (${item.quantity} × ${item.price} ${settings.currency})`).join('\n')}\n\n` +
-                               `💰 المجموع: ${order.total} ${settings.currency}\n` +
-                               `📋 رقم الطلب: ${order.orderNumber}\n` +
-                               `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}`;
+                const message = `📦 *طلب جديد من موقع ماليزيا الذهبية*\n\n` +
+                               `👤 *الاسم:* ${order.customerName}\n` +
+                               `📱 *الهاتف:* ${order.customerPhone}\n` +
+                               `📍 *العنوان:* ${order.address || 'لم يتم تحديد العنوان'}\n` +
+                               `💰 *طريقة الدفع:* ${order.paymentMethod === 'cash' ? 'نقداً عند الاستلام' : 'بطاقة'}\n\n` +
+                               `🛒 *المنتجات:*\n${order.items.map(item => 
+                                   `▫️ ${item.productName}\n   ${item.quantity} × ${item.price} ${this.settings.currencySymbol} = ${item.total} ${this.settings.currencySymbol}`
+                               ).join('\n')}\n\n` +
+                               `📊 *الملخص:*\n` +
+                               `▫️ المجموع الفرعي: ${order.subtotal} ${this.settings.currencySymbol}\n` +
+                               `▫️ رسوم التوصيل: ${order.deliveryFee} ${this.settings.currencySymbol}\n` +
+                               `▫️ *الإجمالي: ${order.total} ${this.settings.currencySymbol}*\n\n` +
+                               `📋 *رقم الطلب:* ${order.orderNumber}\n` +
+                               `📅 *التاريخ:* ${new Date().toLocaleDateString('ar-SA', {
+                                   weekday: 'long',
+                                   year: 'numeric',
+                                   month: 'long',
+                                   day: 'numeric',
+                                   hour: '2-digit',
+                                   minute: '2-digit'
+                               })}`;
                 
                 const encodedMessage = encodeURIComponent(message);
                 const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
                 
                 // فتح واتساب في نافذة جديدة
-                window.open(whatsappURL, '_blank');
+                window.open(whatsappURL, '_blank', 'noopener,noreferrer');
+            }
+
+            viewProductDetails(productId) {
+                const product = simpleStorage.getProduct(productId);
+                if (!product) return;
+                
+                const modalHTML = `
+                    <div class="modal-overlay" id="productDetailModal" style="display: flex;">
+                        <div class="modal-content" style="max-width: 800px;">
+                            <div class="modal-header">
+                                <h3><i class="fas fa-box"></i> ${product.name}</h3>
+                                <button class="modal-close" onclick="this.closest('.modal-overlay').remove();">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                                    <div>
+                                        <img src="${product.image}" 
+                                             alt="${product.name}" 
+                                             style="width: 100%; border-radius: var(--radius); box-shadow: var(--shadow);">
+                                    </div>
+                                    <div>
+                                        <div style="background: rgba(67, 97, 238, 0.1); color: #4361EE; padding: 8px 15px; border-radius: 20px; display: inline-block; font-weight: 600; margin-bottom: 15px;">
+                                            ${product.brand}
+                                        </div>
+                                        <h2 style="color: var(--navy); margin-bottom: 20px;">${product.name}</h2>
+                                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                                            <div style="font-size: 2rem; font-weight: 800; color: var(--emerald);">
+                                                ${product.price} ${this.settings.currencySymbol}
+                                            </div>
+                                            ${product.originalPrice ? 
+                                                `<div style="font-size: 1.2rem; color: #999; text-decoration: line-through;">
+                                                    ${product.originalPrice} ${this.settings.currencySymbol}
+                                                </div>` : ''}
+                                        </div>
+                                        <div style="margin-bottom: 25px;">
+                                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                                <span class="stock-badge stock-${product.stock > 10 ? 'high' : (product.stock > 0 ? 'low' : 'none')}"></span>
+                                                <span style="font-weight: 600; color: ${product.stock > 10 ? 'var(--emerald)' : (product.stock > 0 ? 'var(--warning)' : 'var(--danger)')}">
+                                                    ${product.stock > 10 ? 'متوفر' : (product.stock > 0 ? 'كمية محدودة' : 'غير متوفر')}
+                                                </span>
+                                            </div>
+                                            <div style="color: #666; font-size: 0.9rem;">
+                                                ${product.stock} وحدة متوفرة في المخزون
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-success" onclick="appMain.addToCart(${product.id}); this.closest('.modal-overlay').remove();" 
+                                                style="width: 100%; padding: 18px; font-size: 1.1rem;"
+                                                ${!product.available || product.stock <= 0 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                                            <i class="fas fa-cart-plus"></i>
+                                            ${!product.available || product.stock <= 0 ? 'غير متوفر' : 'أضف إلى العربة'}
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #f8f9fa; padding: 25px; border-radius: var(--radius);">
+                                    <h4 style="color: var(--navy); margin-bottom: 15px;"><i class="fas fa-info-circle"></i> الوصف</h4>
+                                    <p style="color: #666; line-height: 1.8;">${product.description}</p>
+                                    
+                                    ${product.tags && product.tags.length > 0 ? `
+                                        <div style="margin-top: 20px;">
+                                            <h4 style="color: var(--navy); margin-bottom: 10px;"><i class="fas fa-tags"></i> العلامات</h4>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                                ${product.tags.map(tag => 
+                                                    `<span style="background: white; padding: 8px 15px; border-radius: 20px; color: #666; border: 1px solid #eef2f7; font-size: 0.9rem;">${tag}</span>`
+                                                ).join('')}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${product.category && product.category.length > 0 ? `
+                                        <div style="margin-top: 20px;">
+                                            <h4 style="color: var(--navy); margin-bottom: 10px;"><i class="fas fa-folder"></i> التصنيف</h4>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                                ${product.category.map(cat => 
+                                                    `<span style="background: rgba(67, 97, 238, 0.1); color: #4361EE; padding: 8px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">${cat}</span>`
+                                                ).join('')}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // إضافة المودال إلى الصفحة
+                const modalContainer = document.createElement('div');
+                modalContainer.innerHTML = modalHTML;
+                document.body.appendChild(modalContainer.firstElementChild);
             }
 
             showAlert(message, type = 'info') {
+                // إزالة أي إشعارات سابقة
+                document.querySelectorAll('.custom-alert').forEach(alert => alert.remove());
+                
                 const alert = document.createElement('div');
+                alert.className = 'custom-alert';
                 alert.style.cssText = `
                     position: fixed;
                     top: 20px;
                     right: 20px;
-                    background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : type === 'warning' ? '#FF9800' : '#2196F3'};
+                    background: ${type === 'success' ? 'linear-gradient(135deg, #4CAF50, #45a049)' : 
+                               type === 'error' ? 'linear-gradient(135deg, #f44336, #d32f2f)' : 
+                               type === 'warning' ? 'linear-gradient(135deg, #FF9800, #F57C00)' : 
+                               'linear-gradient(135deg, #2196F3, #1976D2)'};
                     color: white;
-                    padding: 15px 25px;
-                    border-radius: 8px;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                    padding: 20px 30px;
+                    border-radius: 12px;
+                    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
                     z-index: 9999;
                     animation: slideIn 0.3s ease-out;
                     font-family: 'Tajawal', sans-serif;
-                    min-width: 300px;
+                    min-width: 350px;
+                    max-width: 400px;
                     display: flex;
                     align-items: center;
-                    gap: 10px;
+                    gap: 15px;
+                    backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255,255,255,0.1);
                 `;
                 
+                const icon = type === 'success' ? 'fa-check-circle' : 
+                           type === 'error' ? 'fa-exclamation-circle' : 
+                           type === 'warning' ? 'fa-exclamation-triangle' : 
+                           'fa-info-circle';
+                
                 alert.innerHTML = `
-                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
-                    <span>${message}</span>
+                    <i class="fas ${icon}" style="font-size: 1.5rem; flex-shrink: 0;"></i>
+                    <span style="flex: 1;">${message}</span>
+                    <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s;"
+                            onmouseenter="this.style.background='rgba(255,255,255,0.2)'"
+                            onmouseleave="this.style.background='transparent'">×</button>
                 `;
                 
                 document.body.appendChild(alert);
@@ -1128,26 +2286,63 @@
                             from { transform: translateX(0); opacity: 1; }
                             to { transform: translateX(100%); opacity: 0; }
                         }
+                        @keyframes spin {
+                            to { transform: rotate(360deg); }
+                        }
+                        .loading {
+                            display: inline-block;
+                            width: 20px;
+                            height: 20px;
+                            border: 3px solid rgba(255,255,255,.3);
+                            border-radius: 50%;
+                            border-top-color: white;
+                            animation: spin 1s ease-in-out infinite;
+                        }
                     `;
                     document.head.appendChild(style);
                 }
                 
-                // إزالة الإشعار بعد 3 ثوان
+                // إزالة الإشعار بعد 4 ثوان
                 setTimeout(() => {
-                    alert.style.animation = 'slideOut 0.3s ease-out';
-                    setTimeout(() => {
-                        if (alert.parentElement) {
-                            alert.remove();
-                        }
-                    }, 300);
-                }, 3000);
+                    if (alert.parentElement) {
+                        alert.style.animation = 'slideOut 0.3s ease-out';
+                        setTimeout(() => {
+                            if (alert.parentElement) {
+                                alert.remove();
+                            }
+                        }, 300);
+                    }
+                }, 4000);
+            }
+
+            handleScroll() {
+                // يمكن إضافة تحميل المزيد من المنتجات عند التمرير
+                const scrollPosition = window.scrollY;
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight;
+                
+                if (scrollPosition + windowHeight >= documentHeight - 200) {
+                    // إمكانية إضافة تحميل المزيد من المنتجات هنا
+                }
+            }
+
+            animateElements() {
+                // إضافة تأخير للعناصر المتحركة
+                const elements = document.querySelectorAll('.animate-fadeInUp');
+                elements.forEach((el, index) => {
+                    el.style.animationDelay = `${index * 0.1}s`;
+                });
             }
         }
 
+        // ========================================
         // إنشاء نسخة عالمية
+        // ========================================
         window.appMain = new MainApp();
 
+        // ========================================
         // تعرييف الدوال للاستخدام الخارجي
+        // ========================================
         window.closeOrderModal = function() {
             appMain.closeOrderModal();
         };
@@ -1156,14 +2351,22 @@
             appMain.submitOrder();
         };
 
+        // ========================================
         // تشغيل التطبيق عند تحميل الصفحة
+        // ========================================
         document.addEventListener('DOMContentLoaded', () => {
             // تأخير بسيط للتأكد من تحميل كل شيء
             setTimeout(() => {
                 console.log('✅ موقع ماليزيا الذهبية جاهز للعمل');
             }, 100);
         });
+
+        // ========================================
+        // تحسينات للشاشات المختلفة
+        // ========================================
+        window.addEventListener('resize', () => {
+            // تحديث أي عناصر تحتاج للتعديل حسب حجم الشاشة
+        });
     </script>
 </body>
 </html>
-
